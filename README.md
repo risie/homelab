@@ -9,6 +9,11 @@ solution and grow into more advanced tools and services. But sooner than later t
 - [Setup](#setup)
 - [Building and Running an app inside a Container](#building-and-running-an-app-inside-a-container)
 
+## MVP iteration 1
+- Setup the simplest possible environment.
+- No need for persistance. This is run on demand.
+- Run a simple application.
+
 ## Project Structure
 
 The project directory is structured as follows:
