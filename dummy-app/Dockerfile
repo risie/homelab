@@ -1,5 +1,5 @@
 # This is the first stage of a multi-stage build.
-FROM --platform=linux/amd64 golang:1.17 AS builder
+FROM --platform=linux/amd64 golang:1.23.5 AS builder
 
 # Set the Current Working Directory inside the container
 WORKDIR /app
