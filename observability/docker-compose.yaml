@@ -16,7 +16,20 @@ services:
       - --web.enable-remote-write-receiver
       - --config.file=/etc/prometheus/prometheus.yml
 
+  alloy:
+    image: grafana/alloy:latest
+    container_name: alloy
+    restart: on-failure
     volumes:
+      - ./alloy:/etc/alloy/
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "12345:12345"
+    command:
+      - run
+      - /etc/alloy/config.alloy
+      - --storage.path=/var/lib/alloy/data
+      - --server.http.listen-addr=0.0.0.0:12345
 
   grafana:
     environment:
