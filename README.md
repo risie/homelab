@@ -7,12 +7,16 @@ solution and grow into more advanced tools and services. But sooner than later t
 ## Table of Contents
 - [Project Structure](#project-structure)
 - [Setup](#setup)
-- [Building and Running an app inside a Container](#building-and-running-an-app-inside-a-container)
+- [Observability](#observability)
 
 ## MVP iteration 1
 - Setup the simplest possible environment.
 - No need for persistance. This is run on demand.
 - Run a simple application.
+
+## MVP iteration 2
+- Setup logging and monitoring for containers.
+
 
 ## Project Structure
 
@@ -48,3 +52,16 @@ This is the first test where I just deploy a simple Go application inside a Dock
     ```sh
     docker run -p 8080:8080 dummy-app
     ```
+
+## Observability
+
+The observability stack used is Prometheus, Loki, Allow and Grafana.
+
+**Make sure the Docker daemon is running**
+
+Run the following command to start the observability stack:
+```bash
+docker compose -f ./observability/docker-compose.yaml up -d
+```
+
+Log in to grafana on port 3000 with password `admin` and user `admin`. If other docker continers are running, this stack will include those as well.
