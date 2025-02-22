@@ -1,15 +1,13 @@
 services:
   loki:
-    image: grafana/loki:latest
     container_name: loki
-    restart: on-failure
+    image: grafana/loki:latest
     ports:
       - "3100:3100"
 
   prometheus:
     container_name: prometheus
     image: prom/prometheus:latest
-    restart: on-failure
     ports:
       - "9090:9090"
     command:
@@ -17,14 +15,13 @@ services:
       - --config.file=/etc/prometheus/prometheus.yml
 
   alloy:
-    image: grafana/alloy:latest
     container_name: alloy
-    restart: on-failure
+    image: grafana/alloy:latest
+    ports:
+      - "12345:12345"
     volumes:
       - ./alloy:/etc/alloy/
       - /var/run/docker.sock:/var/run/docker.sock
-    ports:
-      - "12345:12345"
     command:
       - run
       - /etc/alloy/config.alloy
@@ -32,9 +29,8 @@ services:
       - --server.http.listen-addr=0.0.0.0:12345
 
   grafana:
-    image: grafana/grafana:latest
     container_name: grafana
-    restart: on-failure
+    image: grafana/grafana:latest
     ports:
       - "3000:3000"
     environment:
