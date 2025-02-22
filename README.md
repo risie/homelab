@@ -29,6 +29,14 @@ Homelab/
 │   ├── Dockerfile
 │   ├── go.mod
 │   └── main.go
+├── observability/
+│   ├── alloy/
+│   │   └── config.alloy
+│   ├── docker-compose.yaml
+│   └── grafana/
+│       └── provisioning/
+│           └── datasources/
+│               └── datasource.yaml
 ```
 
 ## Setup
