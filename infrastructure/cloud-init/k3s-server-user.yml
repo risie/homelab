@@ -1,0 +1,28 @@
+#cloud-config
+# Minimal cloud-init for K3s server
+# This keeps the cloud-init small to avoid "too large" errors
+
+package_update: true
+package_upgrade: false
+
+packages:
+  - curl
+  - wget
+  - vim
+
+# Basic system configuration
+timezone: UTC
+locale: en_US.UTF-8
+
+# Disable swap (required for K3s)
+swap:
+  filename: /swap.img
+  size: 0
+  maxsize: 0
+
+runcmd:
+  - swapoff -a
+  - sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+  - echo "Cloud-init complete, ready for K3s installation"
+
+# This keeps the file small - actual K3s installation happens via Terraform provisioner

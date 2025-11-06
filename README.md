@@ -7,6 +7,7 @@ solution and grow into more advanced tools and services. But sooner than later t
 ## Table of Contents
 - [Project Structure](#project-structure)
 - [Setup](#setup)
+- [K3s Cluster Infrastructure](#k3s-cluster-infrastructure)
 - [Observability](#observability)
 
 ## MVP iteration 1
@@ -16,6 +17,10 @@ solution and grow into more advanced tools and services. But sooner than later t
 
 ## MVP iteration 2
 - Setup logging and monitoring for containers.
+
+## MVP iteration 3
+- Setup K3s cluster on Proxmox with OpenTofu
+- Deploy applications to Kubernetes cluster
 
 
 ## Project Structure
@@ -29,6 +34,17 @@ Homelab/
 │   ├── Dockerfile
 │   ├── go.mod
 │   └── main.go
+├── infrastructure/
+│   ├── README.md
+│   ├── main.tf
+│   ├── variables.tf
+│   ├── outputs.tf
+│   ├── terraform.tfvars.example
+│   ├── quick-start.sh
+│   ├── upload-snippets.sh
+│   └── cloud-init/
+│       ├── k3s-server-user.yml
+│       └── k3s-agent-user.yml
 ├── observability/
 │   ├── alloy/
 │   │   └── config.alloy
@@ -60,6 +76,47 @@ This is the first test where I just deploy a simple Go application inside a Dock
     ```sh
     docker run -p 8080:8080 dummy-app
     ```
+
+## K3s Cluster Infrastructure
+
+A production-ready K3s cluster setup on Proxmox using OpenTofu. This solves the common "cloud-init too large" error by using minimal cloud-init configurations stored as Proxmox snippets.
+
+### Features
+
+- **4-node K3s cluster** (1 server + 3 agents)
+- **Smart cloud-init approach** - avoids the 4KB size limit
+- **Automated deployment** with OpenTofu/Terraform
+- **Static IP configuration** for all nodes
+- **Secure token generation** for cluster authentication
+
+### Quick Start
+
+```bash
+cd infrastructure
+
+# Interactive setup wizard
+./quick-start.sh
+
+# Or manual setup
+cp terraform.tfvars.example terraform.tfvars
+# Edit terraform.tfvars with your values
+
+# Upload cloud-init snippets to Proxmox
+./upload-snippets.sh -h <proxmox-host-ip>
+
+# Deploy the cluster
+tofu init
+tofu apply
+```
+
+### What Makes This Smart?
+
+1. **Solves the "too large" problem** - Minimal cloud-init (under 4KB) stored as Proxmox snippets
+2. **Proper orchestration** - Server installs first, then agents join automatically
+3. **No manual steps** - Everything automated from VM creation to K3s installation
+4. **Production-ready** - Swap disabled, kubeconfig accessible, traefik disabled for custom ingress
+
+For detailed documentation, see [infrastructure/README.md](infrastructure/README.md)
 
 ## Observability
 
