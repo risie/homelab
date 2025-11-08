@@ -1,26 +1,129 @@
 # Homelab DevSecOps Platform - Implementation Roadmap
 
-> **Vision**: Build a production-grade, self-hosted Kubernetes platform from scratch, learning DevSecOps practices through progressive implementation.
+> Build a production-grade, self-hosted Kubernetes platform from scratch, learning DevSecOps practices through progressive implementation.
 
-## 🎯 End Goal
+## End Goal
 
 A fully automated, security-hardened, self-sustaining platform that:
 - Hosts real applications exposed to the internet
 - Uses GitOps for all deployments
-- Scans everything (code, containers, images)
+- Scans code, containers, and images
 - Monitors all components
-- Treats infrastructure as cattle, not pets
+- Treats infrastructure as immutable and replaceable
 - Demonstrates professional DevSecOps practices
 
-## 📋 Guiding Principles
+## Guiding Principles
 
-1. **Progressive Complexity** - Baby steps to monster
-2. **Learn by Doing** - Hands-on at every phase
-3. **Security First** - Baked in, not bolted on
-4. **Production Patterns** - Real-world practices
-5. **Overkill Mode** - Professional grade for homelab
-6. **Understand Why** - Context for every decision
-7. **Reference Worthy** - Documentation you'll return to
+1. **Progressive Complexity** - Start simple, add layers methodically
+2. **Learn by Doing** - Hands-on implementation at every phase
+3. **Security First** - Built-in from the start, not added later
+4. **Production Patterns** - Industry-standard practices
+5. **Understand Why** - Context and reasoning for each decision
+6. **Open Source** - Prefer open source tools (Forgejo over Gitea, Podman over Docker)
+7. **Cattle not Pets** - Cluster state in Git, only application data needs backup
+
+## Technology Stack
+
+**Infrastructure**
+- Proxmox VE (virtualization)
+- Terraform/OpenTofu (IaC)
+- Packer (image building)
+
+**Kubernetes**
+- K3s (Phases 1-8, learning)
+- K8s (Phase 9+, production)
+- Longhorn (distributed storage)
+
+**Platform Services**
+- Forgejo (self-hosted Git)
+- Harbor (container registry)
+- Woodpecker/Tekton (CI/CD)
+- ArgoCD (GitOps)
+
+**Security**
+- Trivy (vulnerability scanning)
+- Cosign (image signing)
+- OPA Gatekeeper + Kyverno (policy as code)
+- Falco (runtime security/RASP)
+- Sealed Secrets (secret management)
+
+**Observability**
+- Prometheus (metrics)
+- Grafana (dashboards)
+- Loki (log aggregation)
+
+**Networking**
+- Cloudflare Tunnel (zero-trust access)
+- NGINX Ingress (with WAF)
+- cert-manager (TLS automation)
+- Network Policies (segmentation/DMZ)
+
+**Resilience**
+- Chaos Mesh (chaos engineering)
+- Velero (backup/restore)
+
+## Phase Overview
+
+**Phase 0**: Prerequisites & Planning (1-2 days)
+**Phase 1**: Manual K3s Cluster (1 week)
+**Phase 2**: Infrastructure as Code with Terraform (1 week)
+**Phase 3**: Immutable Infrastructure with Packer (1 week)
+**Phase 4**: Self-Hosted Platform Services (2-3 weeks)
+**Phase 5**: GitOps with ArgoCD (2 weeks)
+**Phase 6**: Clustered Storage & Security (2 weeks)
+**Phase 7**: Security Hardening & Scanning (3-4 weeks)
+**Phase 8**: Observability & Monitoring (2 weeks)
+**Phase 9**: K3s to K8s Migration (1 week)
+**Phase 10**: Advanced Networking, DMZ & VPN (2-3 weeks)
+**Phase 11**: Chaos Engineering (1-2 weeks)
+**Phase 12**: PXE Boot & Physical Nodes (1-2 weeks)
+**Phase 13**: Cluster API & Multi-Cluster (2-3 weeks)
+**Phase 14**: Production Hardening (2 weeks)
+**Phase 15**: Showcase & Portfolio (1-2 weeks)
+
+**Total Duration**: 6-8 months of focused learning
+
+## Network Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Internet (via Cloudflare)                │
+└────────────────────────┬────────────────────────────────────┘
+                         │
+                         │ Cloudflare Tunnel (Zero Trust)
+                         │
+┌────────────────────────▼────────────────────────────────────┐
+│                  Kubernetes Cluster (K8s)                   │
+│                                                             │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐    │
+│  │ DMZ Zone     │  │ Internal Zone│  │ Monitoring   │    │
+│  │ (Public Apps)│  │ (Platform)   │  │ Zone         │    │
+│  ├──────────────┤  ├──────────────┤  ├──────────────┤    │
+│  │ - Website    │  │ - Forgejo    │  │ - Prometheus │    │
+│  │ - Public API │  │ - Harbor     │  │ - Grafana    │    │
+│  │              │  │ - Woodpecker │  │ - Loki       │    │
+│  │ (Isolated)   │  │ - ArgoCD     │  │              │    │
+│  └──────────────┘  └──────────────┘  └──────────────┘    │
+│                                                             │
+│  Network Policies enforce isolation between zones          │
+│  Longhorn provides replicated storage across nodes         │
+└─────────────────────────────────────────────────────────────┘
+```
+
+## Key Learning Outcomes
+
+By completing this roadmap, you will understand:
+
+1. **Kubernetes Fundamentals**: Pods, Services, Deployments, StatefulSets, ConfigMaps, Secrets
+2. **Infrastructure as Code**: Terraform, Packer, declarative infrastructure
+3. **GitOps**: ArgoCD, declarative deployments, Git as source of truth
+4. **Container Security**: Vulnerability scanning, image signing, policy enforcement, RASP
+5. **Networking**: Ingress, Network Policies, service meshes, DMZ architecture
+6. **Observability**: Metrics, logs, traces, dashboards, alerting
+7. **Resilience**: Chaos engineering, backup/restore, disaster recovery
+8. **Platform Engineering**: Self-hosted services, CI/CD, automation
+9. **Policy as Code**: OPA Gatekeeper, Kyverno, admission controllers
+10. **Production Operations**: Upgrades, migrations, troubleshooting
 
 ---
 
@@ -464,9 +567,9 @@ packer build k3s-node.pkr.hcl
 
 ```
 Management Cluster (K3s)
-├── Gitea (self-hosted git)
+├── Forgejo (self-hosted git)
 ├── Harbor (container registry)
-├── Drone/Tekton (CI/CD)
+├── Woodpecker/Tekton (CI/CD)
 └── Persistent storage (local-path)
 ```
 
@@ -489,12 +592,12 @@ Management Cluster (K3s)
 
 ## Steps
 
-### 4.1: Deploy Gitea (Self-Hosted Git)
+### 4.1: Deploy Forgejo (Self-Hosted Git)
 
 ```bash
 # Using Helm for simplicity
-helm repo add gitea-charts https://dl.gitea.io/charts/
-helm install gitea gitea-charts/gitea \
+helm repo add forgejo https://forgejo.org/charts/
+helm install forgejo forgejo/forgejo \
   --set persistence.enabled=true \
   --set service.type=ClusterIP
 ```
@@ -503,19 +606,19 @@ helm install gitea gitea-charts/gitea \
 
 **Storage**: Local path provisioner (K3s default)
 
-### 4.2: Configure Gitea
+### 4.2: Configure Forgejo
 
 - Create admin account
 - Enable SSH (for git operations)
 - Create organization: "infrastructure"
 - Create repos: "terraform", "kubernetes", "packer"
 
-### 4.3: Mirror GitHub to Gitea
+### 4.3: Mirror GitHub to Forgejo
 
 ```bash
-# Push existing infrastructure code to Gitea
-git remote add gitea http://gitea.yourdomain.local/infrastructure/terraform
-git push gitea main
+# Push existing infrastructure code to Forgejo
+git remote add forgejo http://forgejo.yourdomain.local/infrastructure/terraform
+git push forgejo main
 ```
 
 **Keep GitHub as backup** (for now)
@@ -539,11 +642,13 @@ helm install harbor harbor/harbor \
 - Configure retention policies
 - Create robot account for CI/CD
 
-### 4.6: Deploy CI/CD (Drone or Tekton)
+### 4.6: Deploy CI/CD (Woodpecker or Tekton)
 
-**Drone** (simpler, good for learning):
+**Woodpecker** (Forgejo-native, simpler):
 ```bash
-helm install drone drone/drone
+helm repo add woodpecker https://woodpecker-ci.org/
+helm install woodpecker woodpecker/woodpecker-server
+helm install woodpecker-agent woodpecker/woodpecker-agent
 ```
 
 **Or Tekton** (more K8s-native):
@@ -552,22 +657,24 @@ kubectl apply -f https://storage.googleapis.com/tekton-releases/pipeline/latest/
 ```
 
 **Configure**:
-- Connect to Gitea
+- Connect to Forgejo
 - Add webhook for builds
 - Configure to push to Harbor
 
-### 4.7: First Self-Hosted Pipeline
+### 4.7: First Self-Hosted Pipeline (Using Podman)
 
-**Goal**: Push to Gitea → Drone builds → Image to Harbor
+**Note**: Use Podman instead of Docker for rootless, daemonless container builds.
+
+**Goal**: Push to Forgejo → Woodpecker builds → Image to Harbor
 
 ```yaml
-# .drone.yml in your app repo
-kind: pipeline
-name: build
+# .woodpecker.yml in your app repo
+when:
+  branch: main
 
 steps:
-  - name: build
-    image: plugins/docker
+  build:
+    image: woodpeckerci/plugin-docker-buildx
     settings:
       registry: harbor.yourdomain.local
       repo: harbor.yourdomain.local/homelab/myapp
@@ -575,16 +682,34 @@ steps:
         from_secret: harbor_user
       password:
         from_secret: harbor_pass
+      podman: true  # Use Podman instead of Docker
 ```
 
 **Test**:
 ```bash
-git push gitea main
-# Watch build in Drone
+git push forgejo main
+# Watch build in Woodpecker
 # Verify image in Harbor
 ```
 
 ### 4.8: Backup Strategy
+
+**Critical Distinction**:
+
+**Cluster State** (No backup needed):
+- All cluster configuration in Git (GitOps)
+- VM templates built via Packer (versioned)
+- Infrastructure defined in Terraform (versioned)
+- Cluster is cattle - destroy and recreate anytime
+
+**Application Data** (Backup required):
+- Database contents
+- User uploads
+- Git repositories
+- Container registry images
+- Any persistent volumes
+
+**Implementation**:
 
 **Critical**: These services store everything
 
@@ -598,19 +723,21 @@ velero schedule create daily --schedule="@daily"
 ```
 
 **Also backup**:
-- Database dumps (Gitea, Harbor)
+- Database dumps (Forgejo, Harbor)
 - Persistent volumes
 - Encryption keys
+- SSH keys for git operations
 
 ## Validation
 
-- [ ] Gitea accessible and working
+- [ ] Forgejo accessible and working
 - [ ] Harbor accessible and scanning images
 - [ ] CI/CD pipeline working
 - [ ] Code in self-hosted git
 - [ ] Images in self-hosted registry
 - [ ] Backups configured and tested
 - [ ] GitHub still mirrored (safety net)
+- [ ] Podman builds working in CI/CD
 
 ## What You Achieved
 
@@ -623,8 +750,9 @@ velero schedule create daily --schedule="@daily"
 ## Troubleshooting
 
 **Persistent storage issues**: Check PVC status
-**Gitea SSH not working**: Check service ports
+**Forgejo SSH not working**: Check service ports and NodePort/LoadBalancer configuration
 **Harbor scanner failing**: Check internet access for CVE database
+**Podman builds failing**: Ensure privileged containers allowed or use Kaniko
 
 ---
 
@@ -676,10 +804,10 @@ kubectl port-forward svc/argocd-server -n argocd 8080:443
 kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
 ```
 
-### 5.2: Connect ArgoCD to Gitea
+### 5.2: Connect ArgoCD to Forgejo
 
 ```bash
-argocd repo add http://gitea.yourdomain.local/infrastructure/kubernetes \
+argocd repo add http://forgejo.yourdomain.local/infrastructure/kubernetes \
   --username admin \
   --password <password>
 ```
@@ -687,16 +815,16 @@ argocd repo add http://gitea.yourdomain.local/infrastructure/kubernetes \
 ### 5.3: Create Application Structure in Git
 
 ```
-gitea.com/infrastructure/kubernetes/
+forgejo.com/infrastructure/kubernetes/
 ├── argocd/
 │   └── apps/
 │       ├── platform-services.yaml
 │       ├── monitoring.yaml
 │       └── applications.yaml
 ├── platform/
-│   ├── gitea/
+│   ├── forgejo/
 │   ├── harbor/
-│   └── drone/
+│   └── woodpecker/
 ├── monitoring/
 │   ├── prometheus/
 │   └── grafana/
@@ -715,7 +843,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: http://gitea.yourdomain.local/infrastructure/kubernetes
+    repoURL: http://forgejo.yourdomain.local/infrastructure/kubernetes
     path: platform
     targetRevision: main
   destination:
@@ -750,7 +878,7 @@ spec:
 ```bash
 git add apps/mywebsite/
 git commit -m "Deploy website v1.0.0"
-git push gitea main
+git push forgejo main
 
 # ArgoCD automatically deploys
 ```
@@ -759,7 +887,7 @@ git push gitea main
 ```bash
 # Change image tag to v1.0.1
 git commit -m "Update website to v1.0.1"
-git push
+git push forgejo main
 
 # ArgoCD auto-updates
 ```
@@ -778,18 +906,18 @@ git push
 
 **Pipeline updates git**:
 ```yaml
-# .drone.yml
+# .woodpecker.yml
 steps:
-  - name: build
-    # Build and push image to Harbor
+  build:
+    # Build and push image to Harbor with Podman
 
-  - name: update-manifest
+  update-manifest:
     image: alpine/git
     commands:
-      - git clone http://gitea.local/infrastructure/kubernetes
+      - git clone http://forgejo.local/infrastructure/kubernetes
       - cd kubernetes/apps/mywebsite
-      - sed -i 's/image:.*/image: harbor.local\/homelab\/mywebsite:${DRONE_TAG}/' deployment.yaml
-      - git commit -m "Update to ${DRONE_TAG}"
+      - sed -i 's/image:.*/image: harbor.local\/homelab\/mywebsite:${CI_COMMIT_TAG}/' deployment.yaml
+      - git commit -m "Update to ${CI_COMMIT_TAG}"
       - git push
 ```
 
@@ -798,11 +926,11 @@ steps:
 ## Validation
 
 - [ ] ArgoCD installed and accessible
-- [ ] Connected to Gitea
+- [ ] Connected to Forgejo
 - [ ] App-of-apps pattern working
 - [ ] Platform services managed by ArgoCD
 - [ ] Applications deployed via git commits
-- [ ] Pipeline updates manifests automatically
+- [ ] Woodpecker pipeline updates manifests automatically
 - [ ] Rollback works (git revert)
 
 ## What You Achieved
@@ -815,29 +943,82 @@ steps:
 
 ---
 
-# Phase 6: Security Hardening & Scanning
+# Phase 6: Clustered Storage & Security
 
-**Goal**: Production-grade security scanning and enforcement
+**Goal**: Add production-grade storage and implement security scanning
 
-**Duration**: 2-3 weeks
+**Duration**: 2 weeks
 
-**Why This Phase**: Now that platform works, make it secure. This is DevSecOps.
+**Why This Phase**: K3s uses local-path storage by default (data tied to nodes). Production needs clustered, replicated storage. Security scanning prevents vulnerabilities in production.
 
 ## What You'll Learn
-- Container scanning
-- Image signing
+- Persistent storage in Kubernetes
+- Storage classes and PVCs
+- Longhorn or Rook-Ceph deployment
+- Container vulnerability scanning
+- Image signing and verification
 - Policy enforcement
-- Runtime security
-- Network policies
+
+## Storage Architecture
+
+**Goal**: Stateless cluster with replicated storage
+
+- Cluster nodes are replaceable (cattle)
+- Data survives node failures
+- Snapshots and backups at storage layer
+
+## Steps
+
+### 6.1: Deploy Longhorn (Distributed Block Storage)
+
+**Why Longhorn?** Simple, Kubernetes-native, good for homelabs.
+
+```bash
+helm repo add longhorn https://charts.longhorn.io
+helm install longhorn longhorn/longhorn -n longhorn-system --create-namespace
+```
+
+**Configure**:
+- Set replication factor (3 for HA)
+- Configure backup target (NFS/S3)
+- Set default storage class
+
+### 6.2: Migrate Existing Apps to Longhorn
+
+Test storage migration with running applications.
+
+### 6.3: Configure Automated Backups
+
+Longhorn → External backup target (separate from cluster)
+
+---
+
+# Phase 7: Security Hardening & Scanning
+
+**Goal**: Production-grade security scanning, policy enforcement, and runtime protection
+
+**Duration**: 3-4 weeks
+
+**Why This Phase**: Now that platform works, make it secure. This is DevSecOps - security built into every layer.
+
+## What You'll Learn
+- Container vulnerability scanning
+- Image signing and verification
+- Policy as Code (OPA Gatekeeper, Kyverno)
+- Runtime Application Self-Protection (RASP)
+- Network policies and segmentation
 - Secrets management
+- Runtime threat detection
 
 ## Security Layers
 
 ```
-Code → Image → Registry → Cluster → Runtime
- ↓      ↓        ↓          ↓         ↓
-Scan   Scan    Scan      Policy   Monitor
+Code → Build → Image → Registry → Admission → Runtime → Network
+ ↓      ↓       ↓        ↓          ↓          ↓         ↓
+Scan   Scan   Sign    Scan      Policy      RASP    Isolate
 ```
+
+**Defense in Depth**: Multiple layers of security controls
 
 ## Prerequisites
 - Phase 5 completed
@@ -846,7 +1027,7 @@ Scan   Scan    Scan      Policy   Monitor
 
 ## Steps
 
-### 6.1: Enable Harbor Vulnerability Scanning
+### 7.1: Enable Harbor Vulnerability Scanning
 
 **Already built-in to Harbor**
 
@@ -859,26 +1040,27 @@ Scan   Scan    Scan      Policy   Monitor
 
 **Test**:
 ```bash
-docker push harbor.local/homelab/myapp:latest
+podman push harbor.local/homelab/myapp:latest
 # Harbor scans automatically
 # View vulnerabilities in UI
 ```
 
-### 6.2: Add Trivy to CI/CD Pipeline
+### 7.2: Add Trivy to CI/CD Pipeline
 
 ```yaml
-# .drone.yml
+# .woodpecker.yml
 steps:
-  - name: security-scan
+  security-scan:
     image: aquasec/trivy
     commands:
       - trivy image --severity HIGH,CRITICAL myapp:latest
       - trivy fs --security-checks vuln,config .
+      - trivy config .  # Scan IaC configs
 ```
 
 **Fails build if**: Critical vulnerabilities found
 
-### 6.3: Implement Image Signing with Cosign
+### 7.3: Implement Image Signing with Cosign
 
 ```bash
 # Install Cosign
@@ -891,10 +1073,11 @@ cosign sign --key cosign.key harbor.local/homelab/myapp:v1.0.0
 
 **Verification**: Only signed images deploy
 
-### 6.4: Deploy Policy Enforcement (OPA Gatekeeper)
+### 7.4: Deploy Policy as Code (OPA Gatekeeper)
 
 ```bash
-helm install gatekeeper gatekeeper/gatekeeper
+helm repo add gatekeeper https://open-policy-agent.github.io/gatekeeper/charts
+helm install gatekeeper gatekeeper/gatekeeper -n gatekeeper-system --create-namespace
 
 # Create policies
 kubectl apply -f policies/
@@ -917,29 +1100,100 @@ spec:
       - "harbor.yourdomain.local"
 ```
 
+**Additional policies**:
+- Require resource limits
+- Block privileged containers
+- Enforce label standards
+- Require readiness/liveness probes
+
 **Test**: Try deploying from Docker Hub → Rejected
 
-### 6.5: Network Policies
+### 7.5: Deploy Kyverno for Advanced Policy Management
 
-**Isolate workloads**:
+**Why Kyverno?** Kubernetes-native, no new language (uses YAML), validation + mutation.
+
+```bash
+helm repo add kyverno https://kyverno.github.io/kyverno/
+helm install kyverno kyverno/kyverno -n kyverno --create-namespace
+```
+
+**Example policies**:
+
+```yaml
+# policies/add-default-network-policy.yaml
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: add-networkpolicy
+spec:
+  rules:
+  - name: default-deny-ingress
+    match:
+      resources:
+        kinds:
+        - Namespace
+    generate:
+      kind: NetworkPolicy
+      name: default-deny-ingress
+      namespace: "{{request.object.metadata.name}}"
+      data:
+        spec:
+          podSelector: {}
+          policyTypes:
+          - Ingress
+```
+
+**Kyverno vs Gatekeeper**:
+- Gatekeeper: Complex policies, OPA Rego language
+- Kyverno: Simple policies, YAML, auto-generation of resources
+
+**Use both**: Gatekeeper for complex logic, Kyverno for mutations and simple validations.
+
+### 7.6: Network Policies
+
+**Default deny everything**:
 ```yaml
 # network-policy.yaml
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: deny-all
+  namespace: production
 spec:
   podSelector: {}
   policyTypes:
   - Ingress
   - Egress
----
-# Then allow specific traffic
 ```
 
-**Why?** Defense in depth, limit blast radius
+**Then add specific allows**:
+```yaml
+# Allow DNS
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-dns
+spec:
+  podSelector: {}
+  policyTypes:
+  - Egress
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: kube-system
+    ports:
+    - protocol: UDP
+      port: 53
+```
 
-### 6.6: Secrets Management with Sealed Secrets
+**Segmentation zones**:
+- DMZ namespace: Public-facing apps (website, APIs)
+- Internal namespace: Platform services (Forgejo, Harbor)
+- Monitoring namespace: Observability stack
+- No cross-namespace traffic by default
+
+### 7.7: Secrets Management with Sealed Secrets
 
 **Problem**: Can't commit secrets to git
 
@@ -959,7 +1213,7 @@ git add mysealedsecret.yaml
 
 **Controller decrypts** in cluster
 
-### 6.7: Runtime Security with Falco
+### 7.8: Runtime Application Self-Protection (RASP) with Falco
 
 ```bash
 helm install falco falcosecurity/falco
@@ -974,7 +1228,7 @@ kubectl logs -n falco -l app=falco
 - File modifications
 - Privilege escalations
 
-### 6.8: Security Scanning Dashboard
+### 7.9: Security Scanning Dashboard
 
 **Aggregate security data**:
 - Harbor vulnerability counts
@@ -1006,7 +1260,9 @@ kubectl logs -n falco -l app=falco
 
 ---
 
-# Phase 7: Observability & Monitoring
+# Phase 8: Observability & Monitoring
+
+**Goal**: Full visibility into cluster, applications, and security
 
 **Goal**: Full visibility into cluster and applications
 
@@ -1174,7 +1430,110 @@ http.Handle("/metrics", promhttp.Handler())
 
 ---
 
-# Phase 8: Advanced Networking & Firewalls
+# Phase 9: K3s to K8s Migration (Zero-Downtime)
+
+**Goal**: Migrate from K3s to full Kubernetes with zero downtime
+
+**Duration**: 1 week
+
+**Why This Phase**: You've learned Kubernetes fundamentals on K3s. Now migrate to production-grade K8s to understand cluster management, etcd, control plane components, and real-world migration patterns.
+
+## What You'll Learn
+- K8s vs K3s architecture differences
+- Control plane components (etcd, kube-apiserver, kube-controller-manager)
+- Blue-green cluster deployment
+- Application migration strategies
+- DNS cutover techniques
+- Validating application state post-migration
+
+## Migration Strategy
+
+**Approach**: Build new K8s cluster alongside K3s, migrate applications, cutover.
+
+**Key Principle**: Application data doesn't care about cluster implementation - it's in Longhorn PVs or external storage.
+
+## Prerequisites
+- All applications deployed via GitOps
+- Storage on Longhorn (cluster-independent)
+- DNS-based service discovery
+- Backup tested and working
+
+## Steps
+
+### 9.1: Build K8s Cluster (Terraform + kubeadm)
+
+**New infrastructure**:
+- 3 control plane nodes
+- 3+ worker nodes
+- Same network, different IPs
+
+```hcl
+# terraform/k8s-cluster/main.tf
+# Use kubeadm to bootstrap control plane
+```
+
+### 9.2: Install Longhorn on K8s Cluster
+
+Same configuration as K3s cluster.
+
+### 9.3: Restore Application Data
+
+**Option A**: Longhorn snapshot restore
+**Option B**: Velero cross-cluster restore
+
+### 9.4: Deploy Applications to K8s via GitOps
+
+Point ArgoCD at new cluster, same manifests.
+
+### 9.5: Validate Applications
+
+Run smoke tests, verify data integrity.
+
+### 9.6: DNS Cutover
+
+Update DNS to point to new K8s cluster.
+
+### 9.7: Monitor and Decommission K3s
+
+After 1 week of stable operation, destroy K3s cluster.
+
+## What You Achieved
+- Hands-on K8s control plane management
+- Real-world migration experience with live applications
+- Understanding of cluster portability and abstraction
+- Confidence in disaster recovery procedures
+- Experience with blue-green cluster deployments
+
+## Critical Insights
+
+**Applications are cluster-agnostic**:
+- Helm charts: Same on K3s and K8s (uses standard K8s APIs)
+- Manifests: No changes needed (standard Kubernetes resources)
+- Storage: Longhorn abstracts the storage layer (portable PVs)
+- GitOps: Same Git repo deploys to both clusters
+- Environment variables: External config (ConfigMaps/Secrets)
+
+**What changes**:
+- Control plane architecture (K3s single binary vs K8s multiple components)
+- etcd management (K3s uses SQLite by default, K8s uses etcd cluster)
+- Resource usage (K8s requires more memory for control plane)
+- Upgrade procedures (different tooling)
+
+**Why this migration matters for learning**:
+1. **De-mystifies Kubernetes**: See that K8s is just APIs, implementation doesn't matter
+2. **Production readiness**: K8s is what enterprises run
+3. **Troubleshooting skills**: Understanding control plane components helps debugging
+4. **Operational experience**: Migrations are real-world scenarios
+5. **Architecture understanding**: See separation of control plane and data plane
+
+**Post-migration, you'll appreciate**:
+- K3s simplicity (perfect for edge/IoT)
+- K8s flexibility (more configuration options)
+- Kubernetes abstraction layer (workloads don't care)
+
+---
+
+# Phase 10: Advanced Networking, DMZ & VPN Access
 
 **Goal**: Production-grade networking with VLANs, firewalls, and segmentation
 
@@ -1213,20 +1572,101 @@ Each VLAN has firewall rules
 
 ## Steps
 
-### 8.1: Deploy Firewall (pfSense or OPNsense)
+### 10.1: Setup Cloudflare Tunnel (Zero Trust Access)
 
-**VM in Proxmox**:
-- 2 NICs (WAN and LAN)
-- 2 CPU, 2GB RAM
-- pfSense ISO
+**Why Cloudflare Tunnel?** No open ports on your home network. Outbound-only connection to Cloudflare's edge. Access internal services securely without VPN.
 
-**Configure VLANs**:
-- VLAN 10: 192.168.10.0/24 (Management)
-- VLAN 20: 192.168.20.0/24 (K8s)
-- VLAN 30: 192.168.30.0/24 (Platform)
-- VLAN 40: 192.168.40.0/24 (Apps)
+```bash
+# Install cloudflared in cluster
+helm repo add cloudflare https://cloudflare.github.io/helm-charts
+helm install cloudflared cloudflare/cloudflare-tunnel \
+  --set tunnel.token=<your-tunnel-token>
+```
 
-### 8.2: Firewall Rules
+**Configuration**:
+1. Create tunnel in Cloudflare dashboard
+2. Add public hostname: `website.yourdomain.com` → `http://mywebsite.dmz.svc.cluster.local`
+3. Add private network: Access Forgejo/Harbor via Cloudflare Access
+4. Configure Access policies (who can access what)
+
+**Result**: Public website accessible via Cloudflare, internal services protected by Access authentication.
+
+### 10.2: Network Segmentation with Kubernetes Namespaces
+
+Create isolated zones using Kubernetes namespaces:
+
+```bash
+# DMZ zone (public-facing)
+kubectl create namespace dmz
+kubectl label namespace dmz zone=public
+
+# Internal zone (platform services)
+kubectl create namespace internal
+kubectl label namespace internal zone=private
+
+# Monitoring zone
+kubectl create namespace monitoring
+kubectl label namespace monitoring zone=observability
+```
+
+**NetworkPolicies for segmentation**:
+
+```yaml
+# dmz-isolation.yaml - DMZ can't access internal
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: dmz-isolation
+  namespace: dmz
+spec:
+  podSelector: {}
+  policyTypes:
+  - Egress
+  egress:
+  # Allow DNS
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: kube-system
+    ports:
+    - protocol: UDP
+      port: 53
+  # Allow internet (for external APIs)
+  - to:
+    - namespaceSelector: {}
+      podSelector: {}
+    ports:
+    - protocol: TCP
+      port: 443
+  # DENY access to internal namespace
+  # (implicit deny by not listing it)
+```
+
+```yaml
+# internal-lockdown.yaml - Internal services not accessible from DMZ
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: internal-lockdown
+  namespace: internal
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  ingress:
+  # Only allow from monitoring namespace
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          zone: observability
+  # Allow from same namespace
+  - from:
+    - podSelector: {}
+```
+
+**Result**: Public website compromised? Attacker can't reach Forgejo, Harbor, or monitoring.
+
+### 10.4: Deploy Ingress Controller with WAF
 
 **Default deny, explicit allow**:
 
@@ -1247,16 +1687,29 @@ Management (VLAN 10):
 - Source IP restricted
 ```
 
-### 8.3: Deploy Ingress Controller
+### 10.5: Rate Limiting and DDoS Protection
 
 **Nginx Ingress**:
-```bash
-helm install ingress-nginx ingress-nginx/ingress-nginx
+**NGINX rate limiting**:
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/limit-rps: "10"  # 10 requests per second
+    nginx.ingress.kubernetes.io/limit-connections: "5"
 ```
 
-**Why?** Single entry point, TLS termination, path-based routing
+**Cloudflare DDoS protection** (if using Cloudflare Tunnel):
+- Automatic DDoS mitigation
+- Challenge pages for suspicious traffic
+- Rate limiting at edge
+- Bot protection
 
-### 8.4: Certificate Management (cert-manager)
+**Result**: Your home network protected from traffic spikes
+
+### 10.6: Certificate Management (cert-manager)
 
 ```bash
 helm install cert-manager jetstack/cert-manager --set installCRDs=true
@@ -1267,7 +1720,7 @@ kubectl apply -f letsencrypt-issuer.yaml
 
 **Automatic TLS certificates** for all services
 
-### 8.5: Configure Ingress for Services
+### 10.7: Configure Ingress for Services
 
 ```yaml
 # ingress.yaml
@@ -1297,7 +1750,7 @@ spec:
 
 **Automatic HTTPS** via cert-manager
 
-### 8.6: Service Mesh (Optional - Advanced)
+### 10.8: Service Mesh (Optional - Advanced)
 
 **Linkerd** (simpler) or **Istio** (full-featured)
 
@@ -1354,7 +1807,266 @@ nginx.ingress.kubernetes.io/enable-owasp-core-rules: "true"
 
 ---
 
-# Phase 9: PXE Boot & Physical Nodes
+# Phase 11: Chaos Engineering
+
+**Goal**: Proactively test resilience by injecting failures
+
+**Duration**: 1-2 weeks
+
+**Why This Phase**: You've built a robust platform. Now prove it can survive failures. Chaos engineering finds weaknesses before production does.
+
+## What You'll Learn
+- Chaos engineering principles
+- Failure injection techniques
+- Blast radius containment
+- Recovery validation
+- Observability during incidents
+- Incident response automation
+
+## Prerequisites
+- K8s cluster stable and tested
+- Applications deployed with HA
+- Monitoring and alerting configured
+- Backup/restore tested
+
+## Chaos Engineering Principles
+
+1. **Hypothesis**: Define expected behavior
+2. **Inject**: Introduce real-world failures
+3. **Observe**: Monitor system response
+4. **Learn**: Document findings and fix weaknesses
+
+## Tools
+
+**Chaos Mesh** (Kubernetes-native, comprehensive):
+```bash
+helm repo add chaos-mesh https://charts.chaos-mesh.org
+helm install chaos-mesh chaos-mesh/chaos-mesh \
+  --namespace=chaos-mesh \
+  --create-namespace \
+  --set dashboard.create=true
+```
+
+**Litmus** (CNCF project, good for K8s):
+```bash
+kubectl apply -f https://litmuschaos.github.io/litmus/litmus-operator-latest.yaml
+```
+
+## Steps
+
+### 11.1: Pod Failure Experiments
+
+**Kill random pods**:
+```yaml
+apiVersion: chaos-mesh.org/v1alpha1
+kind: PodChaos
+metadata:
+  name: pod-kill-example
+spec:
+  action: pod-kill
+  mode: one
+  selector:
+    namespaces:
+      - production
+    labelSelectors:
+      app: mywebsite
+  scheduler:
+    cron: '@every 15m'
+```
+
+**Expected**: Application stays available (replica set recovers)
+
+### 11.2: Network Chaos
+
+**Inject latency**:
+```yaml
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: network-delay
+spec:
+  action: delay
+  mode: all
+  selector:
+    namespaces:
+      - production
+  delay:
+    latency: "500ms"
+    correlation: "50"
+  duration: "5m"
+```
+
+**Test**: Application timeouts, retries, circuit breakers
+
+**Packet loss**:
+```yaml
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: network-loss
+spec:
+  action: loss
+  mode: one
+  selector:
+    namespaces:
+      - production
+  loss:
+    loss: "25"
+  duration: "2m"
+```
+
+### 11.3: Stress Testing
+
+**CPU stress**:
+```yaml
+apiVersion: chaos-mesh.org/v1alpha1
+kind: StressChaos
+metadata:
+  name: cpu-stress
+spec:
+  mode: one
+  selector:
+    namespaces:
+      - production
+  stressors:
+    cpu:
+      workers: 4
+      load: 50
+  duration: "5m"
+```
+
+**Memory stress**:
+```yaml
+apiVersion: chaos-mesh.org/v1alpha1
+kind: StressChaos
+metadata:
+  name: memory-stress
+spec:
+  mode: one
+  selector:
+    namespaces:
+      - production
+  stressors:
+    memory:
+      workers: 4
+      size: "512MB"
+  duration: "3m"
+```
+
+**Expected**: Horizontal Pod Autoscaler scales up
+
+### 11.4: Storage Failures
+
+**I/O errors**:
+```yaml
+apiVersion: chaos-mesh.org/v1alpha1
+kind: IOChaos
+metadata:
+  name: io-error
+spec:
+  action: fault
+  mode: one
+  selector:
+    namespaces:
+      - production
+  volumePath: /data
+  path: /data/*
+  errno: 5
+  percent: 50
+  duration: "1m"
+```
+
+**Test**: Application error handling, Longhorn recovery
+
+### 11.5: DNS Failures
+
+```yaml
+apiVersion: chaos-mesh.org/v1alpha1
+kind: DNSChaos
+metadata:
+  name: dns-error
+spec:
+  action: error
+  mode: all
+  selector:
+    namespaces:
+      - production
+  patterns:
+    - forgejo.internal.svc.cluster.local
+  duration: "30s"
+```
+
+**Expected**: Applications retry, service mesh handles gracefully
+
+### 11.6: GameDays - Scheduled Chaos
+
+**Monthly chaos day**:
+1. Schedule 2-hour window
+2. Team monitors dashboards
+3. Run multiple experiments
+4. Document all failures
+5. Create tickets for fixes
+
+**Example scenarios**:
+- "Lose entire worker node"
+- "Database becomes slow"
+- "External API fails"
+- "Network partition between zones"
+
+### 11.7: Blast Radius Control
+
+**Use Chaos Mesh selectors carefully**:
+```yaml
+# Only affect canary deployments
+selector:
+  labelSelectors:
+    version: canary
+
+# Only one pod at a time
+mode: one
+
+# Only specific percentage
+mode: fixed-percent
+value: "10"
+```
+
+**Never chaos in production** (initially - work up to it)
+
+## Validation
+
+- [ ] Chaos Mesh deployed and dashboard accessible
+- [ ] Pod kill experiment run successfully
+- [ ] Application recovered automatically
+- [ ] Network chaos tested (latency, loss)
+- [ ] Stress tests triggered autoscaling
+- [ ] Storage failure handled gracefully
+- [ ] DNS chaos showed retry behavior
+- [ ] All experiments documented
+- [ ] Weaknesses identified and ticketed
+- [ ] Monthly GameDay scheduled
+
+## What You Achieved
+
+✅ Proactive resilience testing
+✅ Confidence in failure recovery
+✅ Observable chaos experiments
+✅ Team experience with incidents
+✅ Identified system weaknesses
+✅ Improved observability during failures
+✅ Automated chaos testing in CI/CD (advanced)
+
+## Common Findings
+
+**Typical weaknesses discovered**:
+- Missing resource limits → OOMKilled
+- No retry logic → cascading failures
+- Single pod deployments → downtime
+- No circuit breakers → slow cascading failures
+- Inadequate monitoring → blind to issues
+
+---
+
+# Phase 12: PXE Boot & Physical Nodes
 
 **Goal**: Add physical devices to cluster using network boot
 
@@ -1459,7 +2171,7 @@ resource "null_resource" "physical_node" {
 
 ---
 
-# Phase 10: Cluster API & Multi-Cluster
+# Phase 13: Cluster API & Multi-Cluster
 
 **Goal**: Declarative cluster management and multi-cluster orchestration
 
@@ -1571,7 +2283,7 @@ spec:
 
 ---
 
-# Phase 11: Production Hardening
+# Phase 14: Production Hardening
 
 **Goal**: Make everything production-ready
 
@@ -1632,7 +2344,7 @@ spec:
 
 ---
 
-# Phase 12: Showcase & Portfolio
+# Phase 15: Showcase & Portfolio
 
 **Goal**: Public demonstration of your work
 
@@ -1642,7 +2354,7 @@ spec:
 
 ## Steps
 
-### 12.1: Public Website
+### 15.1: Public Website
 
 **Showcase**:
 - Architecture diagrams
@@ -1651,7 +2363,7 @@ spec:
 - Monitoring dashboards (read-only)
 - Blog about your journey
 
-### 12.2: GitHub Repository
+### 15.2: GitHub Repository
 
 **Public repo with**:
 - All infrastructure code
@@ -1662,7 +2374,7 @@ spec:
 
 **Sanitize**: Remove secrets, internal IPs
 
-### 12.3: Portfolio Site
+### 15.3: Portfolio Site
 
 **Sections**:
 - About the project
@@ -1673,7 +2385,7 @@ spec:
 - Monitoring/observability
 - Links to code
 
-### 12.4: Blog Series
+### 15.4: Blog Series
 
 **Topics**:
 1. "Building a Production K8s Platform from Scratch"
@@ -1682,7 +2394,7 @@ spec:
 4. "Immutable Infrastructure with Packer"
 5. "Multi-Cluster Management with Cluster API"
 
-### 12.5: Public Monitoring Dashboard
+### 15.5: Public Monitoring Dashboard
 
 **Read-only Grafana**:
 - Cluster health
@@ -1801,8 +2513,10 @@ spec:
 kubectl get nodes
 kubectl get pods -A
 kubectl describe pod <name>
+kubectl top nodes
+kubectl top pods -A
 
-# Terraform
+# Terraform/OpenTofu
 tofu init
 tofu plan
 tofu apply
@@ -1810,46 +2524,216 @@ tofu destroy
 
 # Packer
 packer build template.pkr.hcl
+packer validate template.pkr.hcl
 
 # ArgoCD
 argocd app list
 argocd app sync <app>
+argocd app get <app>
+argocd app rollback <app>
+
+# Forgejo (Git operations)
+git push forgejo main
+git pull forgejo main
+
+# Harbor (Container registry)
+podman login harbor.yourdomain.local
+podman push harbor.yourdomain.local/homelab/myapp:tag
+podman pull harbor.yourdomain.local/homelab/myapp:tag
+
+# Woodpecker CI/CD
+woodpecker-cli build list
+woodpecker-cli build logs <build-number>
+
+# Longhorn (Storage)
+kubectl -n longhorn-system get volumes
+kubectl -n longhorn-system get replicas
+
+# Chaos Mesh
+kubectl get podchaos -A
+kubectl get networkchaos -A
+kubectl describe podchaos <name>
+
+# Security
+kubectl get networkpolicies -A
+kubectl get constrainttemplates
+kubectl get clusterpolicies  # Kyverno
+trivy image <image-name>
+cosign verify --key cosign.pub <image>
 
 # Monitoring
 kubectl logs -f <pod>
 kubectl port-forward svc/grafana 3000:80
+kubectl port-forward svc/prometheus 9090:9090
+
+# Backup/Restore
+velero backup create <name>
+velero restore create --from-backup <name>
+velero backup get
 ```
 
 ## Critical Files
 
 ```
-/infrastructure/       - Terraform code
-/packer/              - Image templates
-/kubernetes/          - K8s manifests
-/docs/                - Documentation
-/.github/workflows/   - CI/CD pipelines
+/infrastructure/
+  ├── main.tf           - Provider and core resources
+  ├── images.tf         - Cloud image downloads
+  ├── variables.tf      - Input variables
+  ├── outputs.tf        - Outputs
+  └── terraform.tfvars  - Variable values (DO NOT COMMIT SECRETS)
+
+/packer/
+  ├── ubuntu-k3s.pkr.hcl       - K3s node template
+  ├── scripts/hardening.sh     - Security hardening
+  └── http/user-data           - Cloud-init configs
+
+/kubernetes/
+  ├── argocd/                  - ArgoCD apps
+  ├── platform/                - Forgejo, Harbor, Woodpecker
+  ├── monitoring/              - Prometheus, Grafana, Loki
+  ├── security/                - OPA, Kyverno policies
+  └── apps/                    - Application manifests
+
+/docs/
+  ├── architecture.md          - System architecture
+  ├── runbooks/                - Operational procedures
+  └── disaster-recovery.md     - DR procedures
+
+/.woodpecker.yml               - CI/CD pipeline config
 ```
 
 ## Emergency Procedures
 
 **Cluster Down**:
 1. Check node status: `kubectl get nodes`
-2. Check system logs: `journalctl -u k3s`
-3. Restart K3s: `systemctl restart k3s`
+2. Check system pods: `kubectl get pods -n kube-system`
+3. Check system logs:
+   - K3s: `journalctl -u k3s`
+   - K8s: `journalctl -u kubelet`
+4. Check control plane:
+   - `kubectl get componentstatuses` (deprecated but useful)
+   - `kubectl cluster-info`
+5. Restart services:
+   - K3s: `systemctl restart k3s`
+   - K8s: `systemctl restart kubelet`
+
+**Storage Issues (Longhorn)**:
+1. Check volume health: `kubectl -n longhorn-system get volumes`
+2. Check replicas: `kubectl -n longhorn-system get replicas`
+3. Check Longhorn manager logs: `kubectl -n longhorn-system logs -l app=longhorn-manager`
+4. Access Longhorn UI: `kubectl port-forward -n longhorn-system svc/longhorn-frontend 8080:80`
 
 **Restore from Backup**:
-1. Access Velero: `velero restore create --from-backup <name>`
-2. Verify: `kubectl get all`
+1. List available backups: `velero backup get`
+2. Create restore: `velero restore create --from-backup <backup-name>`
+3. Monitor restore: `velero restore describe <restore-name>`
+4. Verify applications: `kubectl get all -A`
+5. Check persistent data: Verify application-specific data integrity
 
-**Security Incident**:
-1. Isolate affected nodes
-2. Check Falco alerts
-3. Review audit logs
-4. Restore from known-good backup
-5. Post-mortem documentation
+**Security Incident Response**:
+1. **Contain**:
+   - Isolate affected namespace: `kubectl label namespace <ns> quarantine=true`
+   - Apply network policy to block all traffic
+   - Scale down compromised pods: `kubectl scale deployment <name> --replicas=0`
+2. **Investigate**:
+   - Check Falco alerts: `kubectl logs -n falco -l app=falco`
+   - Review audit logs: `kubectl logs -n kube-system kube-apiserver`
+   - Check policy violations: `kubectl get events -A | grep -i deny`
+   - Review Harbor for suspicious images
+3. **Remediate**:
+   - Delete compromised resources
+   - Scan all images: `trivy image --severity HIGH,CRITICAL <image>`
+   - Update policies to prevent recurrence
+   - Rotate secrets: `kubectl delete secret <name> && kubectl create secret...`
+4. **Recover**:
+   - Deploy from known-good Git commit
+   - Verify with ArgoCD sync
+   - Monitor for 24 hours
+5. **Document**:
+   - Timeline of events
+   - Root cause analysis
+   - Actions taken
+   - Lessons learned
+   - Policy/procedure updates
+
+**GitOps Rollback**:
+1. Find good commit: `git log --oneline`
+2. Revert: `git revert <commit-hash>` or `git reset --hard <commit-hash>`
+3. Push: `git push forgejo main --force` (if reset)
+4. ArgoCD will auto-sync or manually: `argocd app sync <app>`
+5. Verify: `kubectl get pods -A`
+
+**Harbor Registry Down**:
+1. Check Harbor pods: `kubectl -n harbor get pods`
+2. Check PVCs: `kubectl -n harbor get pvc`
+3. Restart Harbor: `kubectl -n harbor rollout restart deployment`
+4. Fallback: Pull from backup registry or Docker Hub temporarily
+5. Rebuild from Forgejo + Woodpecker once Harbor is back
+
+**Catastrophic Failure (Total Cluster Loss)**:
+1. **Prerequisites**: Git repos backed up, Velero backups on external storage
+2. **Rebuild Infrastructure**:
+   ```bash
+   cd infrastructure/
+   tofu apply  # Rebuilds VMs
+   ```
+3. **Bootstrap K8s/K3s**: Re-run cluster bootstrap scripts
+4. **Deploy ArgoCD**:
+   ```bash
+   kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+   ```
+5. **Connect to Forgejo**: `argocd repo add http://forgejo...`
+6. **Deploy App-of-Apps**: `kubectl apply -f argocd/apps/`
+7. **Restore Data**: `velero restore create --from-backup <latest>`
+8. **Verify**: Check all applications, verify data integrity
+9. **Expected Recovery Time**: 2-4 hours from bare metal
+
+**Network Policy Lockout**:
+1. Access node directly via Proxmox console
+2. Edit NetworkPolicy: `kubectl edit networkpolicy <name>`
+3. Or delete: `kubectl delete networkpolicy <name>`
+4. Re-apply correct policy from Git once access restored
 
 ---
 
-**Last Updated**: 2024
-**Version**: 1.0
+## Troubleshooting Common Issues
+
+**Podman builds failing in CI/CD**:
+- Use `privileged: true` in Woodpecker config
+- Or switch to Kaniko: `gcr.io/kaniko-project/executor`
+- Or use Docker-in-Docker with caution
+
+**Forgejo webhooks not triggering Woodpecker**:
+- Check Forgejo admin panel → Webhooks → Recent Deliveries
+- Verify Woodpecker server URL in Forgejo settings
+- Check NetworkPolicy allows Forgejo → Woodpecker traffic
+
+**ArgoCD out of sync but no changes in Git**:
+- Someone made manual kubectl changes
+- Enable auto-heal: `syncPolicy.automated.selfHeal: true`
+- Or manually sync: `argocd app sync <app>`
+
+**Longhorn volume stuck in "Attaching"**:
+- Check node connectivity
+- Verify Longhorn manager has network access to nodes
+- Check Longhorn manager logs for errors
+
+**Chaos experiments affecting production**:
+- Always use `mode: one` for limited blast radius
+- Use selectors carefully: `version: canary` or `env: staging`
+- Start with short durations
+- Have manual sync enabled in ArgoCD during chaos testing
+
+**Certificate renewal failing (cert-manager)**:
+- Check cert-manager logs: `kubectl logs -n cert-manager deploy/cert-manager`
+- Verify DNS challenge working (if using DNS)
+- Check Let's Encrypt rate limits
+- Verify ingress annotations correct
+
+---
+
+**Last Updated**: November 2024
+**Version**: 2.0
 **Status**: Living Document (update as you progress)
+
+**Contributors**: Update this roadmap as you discover better practices!
