@@ -1,0 +1,34 @@
+#cloud-config
+hostname: ${hostname}
+timezone: "UTC"
+
+users:
+  - name: "ubuntu"
+    lock_passwd: true
+    groups:
+      - sudo
+    shell: /bin/bash
+    ssh_authorized_keys:
+      - ${ssh_public_key}
+    sudo: ALL=(ALL) NOPASSWD:ALL
+  - name: root
+    lock_passwd: true
+    ssh_authorized_keys: []
+
+package_update: true
+package_upgrade: true
+
+packages:
+  - qemu-guest-agent
+  - curl
+
+swap:
+  filename: /swap.img
+  size: 0
+  maxsize: 0
+
+runcmd:
+  - systemctl enable qemu-guest-agent
+  - systemctl start qemu-guest-agent
+  - swapoff -a
+  - echo "done" > /tmp/cloud-config.done
