@@ -4,12 +4,12 @@ variable "proxmox_api_url" {
   default     = "https://192.168.68.100:8006"
 }
 
-variable "proxmox_api_token_id" {
+variable "username" {
   description = "Proxmox API Token ID"
   type        = string
 }
 
-variable "proxmox_api_token_secret" {
+variable "password" {
   description = "Proxmox API Token Secret"
   type        = string
   sensitive   = true
@@ -19,65 +19,6 @@ variable "proxmox_node" {
   description = "Proxmox node name"
   type        = string
   default     = "proxmox"
-}
-
-variable "template_name" {
-  description = "Name of the Ubuntu cloud image template"
-  type        = string
-  default     = "ubuntu-cloud-template"
-}
-
-variable "image_storage" {
-  description = "Storage pool for cloud images and ISOs"
-  type        = string
-  default     = "local"
-}
-
-variable "storage_pool" {
-  description = "Storage pool for VM disks"
-  type        = string
-  default     = "local-lvm"
-}
-
-variable "ssh_public_key" {
-  description = "SSH public key for VM access"
-  type        = string
-}
-
-variable "ssh_private_key_path" {
-  description = "Path to SSH private key for provisioning"
-  type        = string
-  default     = "~/.ssh/id_rsa"
-}
-
-variable "ssh_user" {
-  description = "SSH user for cloud-init"
-  type        = string
-  default     = "ubuntu"
-}
-
-variable "gateway" {
-  description = "Network gateway"
-  type        = string
-  default     = "192.168.68.1"
-}
-
-variable "nameserver" {
-  description = "DNS nameserver"
-  type        = string
-  default     = "8.8.8.8"
-}
-
-variable "server_ip" {
-  description = "IP address for K3s server"
-  type        = string
-  default     = "192.168.68.100"
-}
-
-variable "agent_count" {
-  description = "Number of K3s agent nodes"
-  type        = number
-  default     = 3
 }
 
 variable "agent_ips" {
