@@ -1,0 +1,12 @@
+# Packer auto-loaded variables (like terraform.tfvars)
+*.auto.pkrvars.hcl
+
+# Packer cache
+packer_cache/
+
+# Packer build outputs
+output-*/
+*.box
+
+# Packer crash logs
+crash.log
