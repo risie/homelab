@@ -1,6 +1,14 @@
 # Packer auto-loaded variables (like terraform.tfvars)
 *.auto.pkrvars.hcl
 
+# Packer variables with credentials
+*.pkrvars.hcl
+!*.pkrvars.hcl.example
+
+# Environment files with credentials
+.env
+.env.local
+
 # Packer cache
 packer_cache/
 
@@ -10,3 +18,6 @@ output-*/
 
 # Packer crash logs
 crash.log
+
+# Manifests (may contain sensitive info)
+manifests/
