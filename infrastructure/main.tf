@@ -21,7 +21,8 @@ provider "proxmox" {
   }
 }
 locals {
-  server_ip = "192.168.68.111/24"
+  server_ip_cidr = "${var.server_ip}/24"
+  server_ip      = var.server_ip
 }
 
 
@@ -35,11 +36,11 @@ resource "proxmox_virtual_environment_vm" "k3s_server" {
 
   stop_on_destroy = false
   initialization {
-    user_data_file_id = proxmox_virtual_environment_file.cloud_config.id
+    user_data_file_id = proxmox_virtual_environment_file.cloud_config_server.id
 
     ip_config {
       ipv4 {
-        address = local.server_ip
+        address = local.server_ip_cidr
         gateway = "192.168.68.1"
       }
     }
@@ -80,7 +81,7 @@ resource "proxmox_virtual_environment_vm" "k3s_agent" {
   stop_on_destroy = false
 
   initialization {
-    user_data_file_id = proxmox_virtual_environment_file.cloud_config.id
+    user_data_file_id = proxmox_virtual_environment_file.cloud_config_agent[count.index].id
 
     ip_config {
       ipv4 {

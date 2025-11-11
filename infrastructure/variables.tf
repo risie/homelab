@@ -21,6 +21,12 @@ variable "proxmox_node" {
   default     = "proxmox"
 }
 
+variable "server_ip" {
+  description = "IP address for K3s server node"
+  type        = string
+  default     = "192.168.68.111"
+}
+
 variable "agent_ips" {
   description = "IP addresses for K3s agent nodes"
   type        = list(string)
