@@ -1,0 +1,49 @@
+# Example: Using Packer Templates in Terraform/OpenTofu
+# This file shows how to reference Packer-built templates instead of downloading cloud images
+
+# Option 1: Use data source to find template by name (Dynamic)
+# ============================================================
+data "proxmox_virtual_environment_vms" "templates" {
+  node_name = var.proxmox_node
+}
+
+locals {
+  # Find the Packer template by name
+  # After building with Packer, you'll have a template named "ubuntu-25.04"
+  ubuntu_template_id = try([
+    for vm in data.proxmox_virtual_environment_vms.templates.vms :
+    vm.vm_id if vm.name == "ubuntu-25.04"
+  ][0], null)
+}
+
+# Option 2: Hardcode template VM ID (Simple, but requires manual update)
+# ======================================================================
+# After building with Packer, check the VM ID in Proxmox web UI
+# Then uncomment and use this instead:
+#
+# locals {
+#   ubuntu_template_id = 9000  # Replace with your actual template VM ID
+# }
+
+# Option 3: Use variable for template ID (Flexible)
+# ==================================================
+# Add this to variables.tf:
+#
+# variable "ubuntu_template_id" {
+#   description = "VM ID of the Ubuntu Packer template"
+#   type        = number
+#   default     = 9000
+# }
+#
+# Then reference as: var.ubuntu_template_id
+
+# Output for verification
+output "ubuntu_template_id" {
+  description = "The VM ID of the Ubuntu template used for deployments"
+  value       = local.ubuntu_template_id
+}
+
+# Note: To use this, replace the existing images.tf or:
+# 1. Rename images.tf to images-cloudimg.tf.backup
+# 2. Rename this file to images.tf
+# 3. Update main.tf to use template_id instead of image_id

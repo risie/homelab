@@ -1,0 +1,70 @@
+# K3s VM Module - Packer Template Version
+# This version clones from a Packer-built template instead of importing cloud images
+
+resource "proxmox_virtual_environment_vm" "k3s_vm" {
+  name      = var.name
+  node_name = var.node_name
+
+  # Clone from Packer template
+  clone {
+    vm_id = var.template_id
+    full  = true  # Full clone (not linked) for independence
+  }
+
+  # QEMU Guest Agent
+  agent {
+    enabled = true
+    timeout = "60s"
+  }
+
+  stop_on_destroy = false
+
+  # Cloud-init configuration
+  initialization {
+    user_data_file_id = var.cloud_init_file.id
+
+    ip_config {
+      ipv4 {
+        address = var.ip_address
+        gateway = var.gateway_ip_address
+      }
+    }
+  }
+
+  # Memory configuration
+  memory {
+    dedicated = 2048
+    floating  = 2048
+  }
+
+  # CPU configuration
+  cpu {
+    cores = 2
+    type  = "host"
+  }
+
+  # Network configuration
+  network_device {
+    bridge = "vmbr0"
+    model  = "virtio"
+  }
+
+  # Disk configuration
+  # Note: When cloning, the disk is already configured from the template
+  # You can resize it here if needed
+  disk {
+    datastore_id = "local-lvm"
+    interface    = "virtio0"
+    iothread     = true
+    discard      = "on"
+    size         = 20  # Will resize if larger than template disk
+  }
+
+  # Lifecycle settings
+  lifecycle {
+    ignore_changes = [
+      # Ignore these to prevent unnecessary recreations
+      clone,
+    ]
+  }
+}
