@@ -21,14 +21,26 @@ variable "proxmox_node" {
   default     = "proxmox"
 }
 
-variable "server_ip" {
-  description = "IP address for K3s server node"
+variable "network_cidr" {
+  description = "Network CIDR for K3s cluster"
   type        = string
-  default     = "192.168.68.111"
+  default     = "192.168.68.0/24"
 }
 
-variable "agent_ips" {
-  description = "IP addresses for K3s agent nodes"
-  type        = list(string)
-  default     = ["192.168.68.101", "192.168.68.102", "192.168.68.103"]
+variable "server_ip_offset" {
+  description = "IP offset for K3s server"
+  type        = number
+  default     = 110
+}
+
+variable "agent_ip_offset" {
+  description = "Starting IP offset for K3s agents"
+  type        = number
+  default     = 120
+}
+
+variable "agent_count" {
+  description = "Number of K3s agent nodes"
+  type        = number
+  default     = 3
 }

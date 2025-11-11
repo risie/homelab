@@ -9,11 +9,11 @@ resource "terraform_data" "fetch_kubeconfig" {
     command = <<-EOT
       echo "Waiting for K3s server to be ready..."
       sleep 120
-      echo "Fetching kubeconfig from ${var.server_ip}..."
+      echo "Fetching kubeconfig from ${local.server_ip_only}..."
       ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR \
-        -i ~/.ssh/lab ubuntu@${var.server_ip} \
+        -i ~/.ssh/lab ubuntu@${local.server_ip_only} \
         'sudo cat /etc/rancher/k3s/k3s.yaml' | \
-        sed 's/127.0.0.1/${var.server_ip}/g' > ${local.kubeconfig_path}
+        sed 's/127.0.0.1/${local.server_ip_only}/g' > ${local.kubeconfig_path}
       chmod 600 ${local.kubeconfig_path}
       echo "Kubeconfig saved to ${local.kubeconfig_path}"
     EOT
@@ -31,11 +31,28 @@ output "export_kubeconfig" {
 }
 
 output "k3s_server_ip" {
-  value       = var.server_ip
+  value       = local.server_ip_only
   description = "K3s server IP address"
+}
+
+output "k3s_agent_ips" {
+  value       = local.agent_ips
+  description = "K3s agent IP addresses"
 }
 
 output "kubectl_test" {
   value       = "kubectl --kubeconfig=${local.kubeconfig_path} get nodes"
   description = "Test command to verify cluster"
+}
+
+output "ip_allocation" {
+  value = {
+    network       = var.network_cidr
+    gateway       = local.gateway_ip
+    server        = local.server_ip_only
+    server_offset = var.server_ip_offset
+    agents        = [for ip in local.agent_ips : split("/", ip)[0]]
+    agent_offset  = var.agent_ip_offset
+  }
+  description = "IP allocation map for the K3s cluster"
 }
