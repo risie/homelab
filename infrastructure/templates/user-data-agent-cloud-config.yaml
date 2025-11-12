@@ -38,5 +38,6 @@ runcmd:
   - systemctl enable qemu-guest-agent
   - systemctl start qemu-guest-agent
   - swapoff -a
+  - while ! curl -k --silent --fail https://${server_ip}:6443/readyz 2>/dev/null; do echo "Waiting for K3s server..."; sleep 5; done
   - curl -sfL https://get.k3s.io | sh -s - agent
   - echo "done" > /tmp/cloud-config.done

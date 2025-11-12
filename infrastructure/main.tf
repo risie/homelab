@@ -29,4 +29,6 @@ module "k3s_agent" {
   ip_address         = local.agent_ips[count.index]
   gateway_ip_address = local.gateway_ip
   image_id           = proxmox_virtual_environment_download_file.ubuntu_cloud_image.id
+
+  depends_on = [module.k3s_server]
 }
