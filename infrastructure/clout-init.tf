@@ -1,3 +1,7 @@
+locals {
+  datastore_id = "local"
+  content_type = "snippets"
+}
 resource "random_password" "k3s_token" {
   length  = 48
   special = false
@@ -8,8 +12,8 @@ data "local_file" "ssh_public_key" {
 }
 
 resource "proxmox_virtual_environment_file" "cloud_config_server" {
-  content_type = "snippets"
-  datastore_id = "local"
+  content_type = local.content_type
+  datastore_id = local.datastore_id
   node_name    = var.proxmox_node
 
   source_raw {
@@ -23,8 +27,8 @@ resource "proxmox_virtual_environment_file" "cloud_config_server" {
 }
 
 resource "proxmox_virtual_environment_file" "cloud_config_agent" {
-  content_type = "snippets"
-  datastore_id = "local"
+  content_type = local.content_type
+  datastore_id = local.datastore_id
   node_name    = var.proxmox_node
 
   source_raw {
