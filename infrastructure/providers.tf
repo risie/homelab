@@ -4,7 +4,7 @@ terraform {
   required_providers {
     proxmox = {
       source  = "bpg/proxmox"
-      version = "0.85.0"
+      version = "0.90.0"
     }
     random = {
       source  = "hashicorp/random"
@@ -18,7 +18,7 @@ provider "proxmox" {
   username = var.username
   password = var.password
   insecure = true
-  ssh {
-    agent = true
-  }
+  # ssh {
+  #   agent = true
+  # }
 }
