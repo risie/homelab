@@ -4,7 +4,4 @@ resource "proxmox_virtual_environment_download_file" "ubuntu_cloud_image" {
   node_name    = var.proxmox_node
   url          = "https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img"
   file_name    = "jammy-server-cloudimg-amd64.qcow2"
-  lifecycle {
-    prevent_destroy = true
-  }
 }
