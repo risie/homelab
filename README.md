@@ -5,27 +5,31 @@ To start with, the setup will be intentionally simple. My hope is to reach a poi
 solution and grow into more advanced tools and services. But sooner than later this will be properly over-engineered anyway.
 
 ## Table of Contents
+
 - [Project Structure](#project-structure)
 - [Setup](#setup)
 - [K3s Cluster Infrastructure](#k3s-cluster-infrastructure)
 - [Observability](#observability)
 
 ## MVP iteration 1
+
 - Setup the simplest possible environment.
 - No need for persistance. This is run on demand.
 - Run a simple application.
 
 ## MVP iteration 2
+
 - Setup logging and monitoring for containers.
 
 ## MVP iteration 3
+
 - Setup K3s cluster on Proxmox with OpenTofu
 - Deploy applications to Kubernetes cluster
-
 
 ## Project Structure
 
 The project directory is structured as follows:
+
 ```markdown
 Homelab/
 ├── .gitignore
@@ -59,6 +63,7 @@ Homelab/
 
 The first iteration of the home lab will be running locally and will not use any additional hardware.
 I will however use virtualization of some form to start with.
+
 - *No setup required.*
 
 ## Building and Running an app inside a Container
@@ -68,11 +73,13 @@ This is the first test where I just deploy a simple Go application inside a Dock
 ### Steps to Build and Run the Docker Image
 
 1. **Build the Docker image**:
+
     ```sh
     docker build -t dummy-app -f ./dummy-app/Dockerfile ./dummy-app
     ```
 
 2. **Run the Docker container**:
+
     ```sh
     docker run -p 8080:8080 dummy-app
     ```
@@ -125,6 +132,7 @@ The observability stack used is Prometheus, Loki, Allow and Grafana.
 **Make sure the Docker daemon is running**
 
 Run the following command to start the observability stack:
+
 ```bash
 docker compose -f ./observability/docker-compose.yaml up -d
 ```
