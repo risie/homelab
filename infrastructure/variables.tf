@@ -1,7 +1,7 @@
 variable "proxmox_api_url" {
   description = "Proxmox API URL"
   type        = string
-  default     = "https://192.168.68.100:8006"
+  default     = "https://192.168.xx.xxx:8006"
 }
 
 variable "username" {
@@ -24,7 +24,7 @@ variable "proxmox_node" {
 variable "network_cidr" {
   description = "Network CIDR for K3s cluster"
   type        = string
-  default     = "192.168.68.0/24"
+  default     = "192.168.xx.0/24"
 }
 
 variable "server_ip_offset" {
