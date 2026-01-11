@@ -2,7 +2,7 @@
 timezone: "UTC"
 
 users:
-  - name: "ubuntu"
+  - name: "agent"
     lock_passwd: true
     groups:
       - sudo
