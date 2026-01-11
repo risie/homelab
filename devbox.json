@@ -4,6 +4,9 @@
     "opentofu@latest",
     "kubectl@latest"
   ],
+  "env": {
+    "KUBECONFIG": "./infrastructure/kubeconfig.yaml"
+  },
   "shell": {
     "init_hook": [
       "echo 'Welcome to devbox!' > /dev/null"
