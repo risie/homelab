@@ -1,9 +1,9 @@
 {
   "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.16.0/.schema/devbox.schema.json",
-  "packages": [
-    "opentofu@latest",
-    "kubectl@latest"
-  ],
+  "packages": {
+    "opentofu": "latest",
+    "kubectl": "latest"
+  },
   "env": {
     "KUBECONFIG": "./infrastructure/kubeconfig.yaml"
   },
