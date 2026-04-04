@@ -1,0 +1,23 @@
+#cloud-config
+timezone: "UTC"
+hostname: ${hostname}
+
+users:
+  - default
+  - name: "user"
+    lock_passwd: true
+    groups:
+      - sudo
+    shell: /bin/bash
+    ssh_authorized_keys:
+      - ${ssh_public_key}
+    sudo: ALL=(ALL) NOPASSWD:ALL
+  - name: root
+    lock_passwd: true
+    ssh_authorized_keys: []
+
+package_update: true
+package_upgrade: true
+
+packages:
+  - qemu-guest-agent
