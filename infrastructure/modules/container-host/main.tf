@@ -1,11 +1,10 @@
+resource "random_pet" "hostname" {}
 locals {
-  name = random_pet.k3s_vm_name.id
+  user_name = "container-host"
+  hostname = random_pet.hostname
+  compose_files = filebase64("${path.module}/applications/compose.yaml")
 }
-resource "random_pet" "k3s_vm_name" {}
 
-data "local_file" "ssh_public_key" {
-  filename = pathexpand("~/.ssh/lab.pub")
-}
 
 resource "proxmox_virtual_environment_file" "cloud_config" {
   content_type = "snippets"
@@ -13,14 +12,17 @@ resource "proxmox_virtual_environment_file" "cloud_config" {
   node_name    = var.proxmox_node_name
   source_raw {
     data = templatefile("${path.module}/templates/user-data-cloud-config.yaml", {
-      ssh_public_key = trimspace(data.local_file.ssh_public_key.content)
-      hostname       = local.name
+      ssh_public_key = trimspace(data.local_file.ssh_public_key)
+      user = local.user_name
+      hostname       = local.hostname
+      compose_files  = local.compose_files
      })
     file_name = "user-data-cloud-config.yaml"
   }
 }
 
-resource "proxmox_virtual_environment_vm" "k3s_vm" {
+
+resource "proxmox_virtual_environment_vm" "vm" {
   name      = name
   node_name = var.proxmox_node_name
   agent {

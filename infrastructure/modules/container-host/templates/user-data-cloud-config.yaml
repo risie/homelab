@@ -4,7 +4,7 @@ hostname: ${hostname}
 
 users:
   - default
-  - name: "user"
+  - name: ${user}
     lock_passwd: true
     groups:
       - sudo
@@ -20,4 +20,16 @@ package_update: true
 package_upgrade: true
 
 packages:
-  - qemu-guest-agent
+  - qemu-runcmd:
+  - docker.io
+  - docker-compose-plugin
+
+write_files:
+  - path: /home/${user}/applications.compose.yaml
+    content: ${compose_files}
+    encoding: b64
+    owner: ${user}:${user}
+    permissions: "0644"
+
+runcmd:
+  - chown -R ${user}:${user} /home/${user}/applications

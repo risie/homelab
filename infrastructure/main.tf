@@ -25,19 +25,18 @@ module "k3s_server" {
   source             = "./modules/k3s-vm"
   name               = "k3sServer"
   node_name          = var.proxmox_node
-  cloud_init_file    = proxmox_virtual_environment_file.cloud_config_server
   ip_address         = local.server_ip
   gateway_ip_address = local.gateway_ip
   image_id           = proxmox_virtual_environment_download_file.ubuntu_cloud_image.id
+  cluster_init_server = true
 }
 
-# K3s Agent VMs
 module "k3s_agent" {
   source             = "./modules/k3s-vm"
-  count              = 3
+  count              = 1 
   name               = "k3sAgent${count.index}"
   node_name          = var.proxmox_node
-  cloud_init_file    = proxmox_virtual_environment_file.cloud_config_agent
+  server_ip_address =  local.server_ip
   ip_address         = local.agent_ips[count.index]
   gateway_ip_address = local.gateway_ip
   image_id           = proxmox_virtual_environment_download_file.ubuntu_cloud_image.id

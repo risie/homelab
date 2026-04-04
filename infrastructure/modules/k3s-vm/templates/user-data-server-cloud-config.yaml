@@ -1,8 +1,10 @@
 #cloud-config
 timezone: "UTC"
+hostname: ${hostname}
 
 users:
-  - name: "server"
+  - default
+  - name: "user"
     lock_passwd: true
     groups:
       - sudo
@@ -21,16 +23,6 @@ packages:
   - qemu-guest-agent
   - curl
 
-write_files:
-  - path: /etc/rancher/k3s/config.yaml
-    content: |
-      token: ${k3s_token}
-      write-kubeconfig-mode: "0644"
-      tls-san: ["${ip}"]
-      cluster-init: true
-    owner: root:root
-    permissions: "0600"
-
 swap:
   filename: /swap.img
   size: 0
@@ -40,5 +32,5 @@ runcmd:
   - systemctl enable qemu-guest-agent
   - systemctl start qemu-guest-agent
   - swapoff -a
-  - curl -sfL https://get.k3s.io | sh -s - server
+  - curl -sfL https://get.k3s.io | K3S_TOKEN=${token} sh -s - --cluster-init --write-kubeconfig-mode=644
   - echo "done" > /tmp/cloud-config.done
