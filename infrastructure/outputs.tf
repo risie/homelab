@@ -2,23 +2,6 @@ locals {
   kubeconfig_path = "${path.cwd}/kubeconfig.yaml"
 }
 
-resource "terraform_data" "fetch_kubeconfig" {
-  depends_on = [module.k3s_server]
-
-  provisioner "local-exec" {
-    command = <<-EOT
-      echo "Waiting for K3s server to be ready..."
-      sleep 120
-      echo "Fetching kubeconfig from ${local.server_ip_only}..."
-      ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR \
-        -i ~/.ssh/lab ubuntu@${local.server_ip_only} \
-        'sudo cat /etc/rancher/k3s/k3s.yaml' | \
-        sed 's/127.0.0.1/${local.server_ip_only}/g' > ${local.kubeconfig_path}
-      chmod 600 ${local.kubeconfig_path}
-      echo "Kubeconfig saved to ${local.kubeconfig_path}"
-    EOT
-  }
-}
 
 output "kubeconfig_path" {
   value       = local.kubeconfig_path
