@@ -1,12 +1,10 @@
 #cloud-config
 timezone: "UTC"
-hostname: ${hostname}
 users:
   - default
   - name: "user"
     lock_passwd: true
-    groups:
-      - sudo
+    groups: [sudo]
     shell: /bin/bash
     ssh_authorized_keys:
       - ${ssh_public_key}
@@ -24,5 +22,3 @@ runcmd:
   - systemctl enable qemu-guest-agent
   - systemctl start qemu-guest-agent
   - swapoff -a
-  - curl -sfL https://get.k3s.io | K3S_TOKEN=${token} sh -s - server --write-kubeconfig-mode=644 --cluster-init
-  - echo "done" > /tmp/cloud-config.done
