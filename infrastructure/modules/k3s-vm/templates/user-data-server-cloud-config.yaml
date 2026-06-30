@@ -1,7 +1,6 @@
 #cloud-config
 timezone: "UTC"
 hostname: ${hostname}
-
 users:
   - default
   - name: "user"
@@ -14,23 +13,16 @@ users:
     sudo: ALL=(ALL) NOPASSWD:ALL
   - name: root
     lock_passwd: true
-    ssh_authorized_keys: []
-
-package_update: true
-package_upgrade: true
-
 packages:
   - qemu-guest-agent
   - curl
-
 swap:
   filename: /swap.img
   size: 0
   maxsize: 0
-
 runcmd:
   - systemctl enable qemu-guest-agent
   - systemctl start qemu-guest-agent
   - swapoff -a
-  - curl -sfL https://get.k3s.io | K3S_TOKEN=${token} sh -s - --cluster-init --write-kubeconfig-mode=644
+  - curl -sfL https://get.k3s.io | K3S_TOKEN=${token} sh -s - server --write-kubeconfig-mode=644 --cluster-init
   - echo "done" > /tmp/cloud-config.done

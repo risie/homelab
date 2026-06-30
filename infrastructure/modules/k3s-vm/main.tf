@@ -2,6 +2,11 @@ resource "random_pet" "k3s_vm_name" {}
 
 locals {
   name = random_pet.k3s_vm_name.id
+  k3s_token = "my-super-secret-shared-token-12345"
+}
+
+data "local_file" "ssh_public_key" {
+  filename = pathexpand("~/.ssh/lab.pub")
 }
 
 
@@ -12,8 +17,8 @@ resource "proxmox_virtual_environment_file" "cloud_config_server_vm" {
 
   source_raw {
     data = templatefile("${path.module}/templates/user-data-server-cloud-config.yaml", {
-      ssh_public_key = trimspace(data.local_file.ssh_public_key.content)
-      token      = var.k3s_token
+      ssh_public_key = data.local_file.ssh_public_key.content
+      token          = local.k3s_token
       hostname       = local.name
      })
     file_name = "user-data-server-cloud-config.yaml"
@@ -27,9 +32,9 @@ resource "proxmox_virtual_environment_file" "cloud_config_agent_vm" {
 
   source_raw {
     data = templatefile("${path.module}/templates/user-data-agent-cloud-config.yaml", {
-      ssh_public_key = trimspace(data.local_file.ssh_public_key.content)
-      token      = k3s_token
-      server_ip  = var.server_ip_address
+      ssh_public_key = data.local_file.ssh_public_key.content
+      token          = local.k3s_token
+      server_ip      = "192.168.68.110"
       hostname       = local.name
      })
     file_name = "user-data-agent-cloud-config.yaml"
