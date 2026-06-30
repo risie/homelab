@@ -33,10 +33,10 @@ module "k3s_server" {
 
 module "k3s_agent" {
   source             = "./modules/k3s-vm"
-  count              = 1 
+  count              = var.agent_count
   name               = "k3sAgent${count.index}"
   node_name          = var.proxmox_node
-  server_ip_address =  local.server_ip
+  server_ip_address =  local.server_ip_only
   ip_address         = local.agent_ips[count.index]
   gateway_ip_address = local.gateway_ip
   image_id           = proxmox_virtual_environment_download_file.ubuntu_cloud_image.id

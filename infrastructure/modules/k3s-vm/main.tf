@@ -34,7 +34,7 @@ resource "proxmox_virtual_environment_file" "cloud_config_agent_vm" {
     data = templatefile("${path.module}/templates/user-data-agent-cloud-config.yaml", {
       ssh_public_key = data.local_file.ssh_public_key.content
       token          = local.k3s_token
-      server_ip      = "192.168.68.110"
+      server_ip      = var.server_ip_address
       hostname       = local.name
      })
     file_name = "user-data-agent-cloud-config.yaml"
