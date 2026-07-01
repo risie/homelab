@@ -8,18 +8,11 @@ variable "node_name" {
   description = "Proxmox node name"
 }
 
-
 variable "server_ip_address" {
   type        = string  
   nullable    = true
   default     = null
   description = "VM IP address without the CIDR or the of the server"
-}
-
-variable "cluster_init_server" {
-  type = bool
-  default = false
-  description = "Define if the node should init the cluster"
 }
 
 variable "ssh_public_key" {
@@ -28,9 +21,9 @@ variable "ssh_public_key" {
   description = "The SSH key that will be used to manage the lab vms"
 }
 
-variable "image_id" {
+variable "vm_template_id" {
   type        = string
-  description = "Id of vm image"
+  description = "specifying which template to clone"
 }
 
 variable "cluster_init" {

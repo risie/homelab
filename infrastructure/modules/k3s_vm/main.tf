@@ -54,7 +54,7 @@ resource "proxmox_virtual_environment_vm"  "k3s_vm_clone" {
   name      = local.name
   node_name = var.node_name
   clone {
-    vm_id = proxmox_virtual_environment_vm.k3s_vm_template.id
+    vm_id = var.vm_template_id
   }
 
   initialization {
@@ -62,45 +62,3 @@ resource "proxmox_virtual_environment_vm"  "k3s_vm_clone" {
     }
   }
 
-resource "proxmox_virtual_environment_vm" "k3s_vm_template" {
-  name      = "template"
-  node_name = var.node_name
-  template  = true
-  started   = false
-  agent {
-    enabled = true
-  }
-
-  initialization {
-     dns {
-      servers = ["1.1.1.1"]
-    }
-    ip_config {
-      ipv4 {
-        address = "dhcp"
-      }
-    }
-    }
-
-  memory {
-    dedicated = 2048
-    floating  = 2048 # set equal to dedicated to enable ballooning
-  }
-  cpu {
-    cores = 2
-    type  = "host"
-  }
-
-  network_device {
-    bridge = "vmbr0"
-    model  = "virtio"
-  }
-  disk {
-    datastore_id = "local-lvm"
-    import_from  = var.image_id
-    interface    = "virtio0"
-    iothread     = true
-    discard      = "on"
-    size         = 20
-  }
-}
