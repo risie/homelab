@@ -44,8 +44,9 @@ resource "proxmox_virtual_environment_file" "k3s_cloud_init_snippet" {
   node_name    = var.node_name
 
   source_raw {
-    data      = data.cloudinit_config.k3s_config.rendered
-    file_name = "k3s-${var.cluster_init ? "server" : "agent"}-config.cfg" 
+    data      = trimspace(data.cloudinit_config.k3s_config.rendered)
+    file_name = "k3s-${var.cluster_init ? "server" : "agent"}-${local.name}-config.cfg" 
+ 
   }
 }
 
