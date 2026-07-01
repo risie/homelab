@@ -8,6 +8,7 @@ write_files:
 %{ if cluster_init }
       cluster-init: true
       write-kubeconfig-mode: "0644"
+      agent-token: "${k3s_token}"
 %{ else }
       server: "https://${server_ip}:6443"
 %{ endif }

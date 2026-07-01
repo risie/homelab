@@ -1,5 +1,6 @@
 #cloud-config
 timezone: "UTC"
+hostname: "${hostname}"
 users:
   - default
   - name: "user"

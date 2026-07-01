@@ -3,3 +3,6 @@ output "server_ip" {
   description = "Main server ip"
 }
 
+output "agent_ips" {
+  value = [for agent in module.k3s_agent : agent.vm_ip]
+}

@@ -15,6 +15,7 @@ data "cloudinit_config" "k3s_config" {
     filename     = "os-bootstrap.yaml"
     content = templatefile("${path.module}/templates/os-bootstrap.yaml.tpl", {
       ssh_public_key = var.ssh_public_key
+      hostname       = local.name
     })
   }
 
@@ -28,10 +29,12 @@ data "cloudinit_config" "k3s_config" {
     })
   }
 
-  part {
+ part {
     content_type = "text/x-shellscript"
     filename     = "install-k3s.sh"
-    content      = file("${path.module}/templates/install-k3s.sh")
+    content = templatefile("${path.module}/templates/install-k3s.sh.tpl", {
+      cluster_init = var.cluster_init
+    })
   }
 }
 
