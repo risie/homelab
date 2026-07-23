@@ -1,19 +1,6 @@
-resource "random_password" "k3s_token" {
-  length  = 48
-  special = false
-}
-
 data "local_file" "ssh_public_key" {
   filename = pathexpand("~/.ssh/lab.pub")
 }
-
-# module "container-host" {
-#   source             = "./modules/container-host"
-#   proxmox_node_name          = var.proxmox_node
-#   ip_address         = "192.168.105.0/24"
-#   gateway_ip_address = local.gateway_ip
-#   image_id           = proxmox_virtual_environment_download_file.ubuntu_cloud_image.id
-# }
 
 module "k3s_server" {
   source              = "./modules/k3s_vm"
@@ -34,53 +21,42 @@ module "k3s_agent" {
   vm_template_id     = proxmox_virtual_environment_vm.template.id
  }
 
-resource "proxmox_virtual_environment_download_file" "ubuntu_cloud_image" {
-  content_type = "import"
-  datastore_id = "local"
-  node_name    = var.proxmox_node
-  url          = "https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img"
-  file_name    = "jammy-server-cloudimg-amd64.qcow2"
-}
 
-resource "proxmox_virtual_environment_vm" "template" {
-  name      = "template"
-  node_name = var.proxmox_node
-  template  = true
-  started   = false
-  agent {
-    enabled = true
+resource "proxmox_virtual_environment_vm" "parrot_security_vm" {
+  name        = "parrot-security"
+  node_name   = var.proxmox_node
+
+  on_boot     = false 
+
+  cpu {
+    cores = 4
   }
-
-  initialization {
-     dns {
-      servers = ["1.1.1.1"]
-    }
-    ip_config {
-      ipv4 {
-        address = "dhcp"
-      }
-    }
-    }
 
   memory {
-    dedicated = 2048
-    floating  = 2048 # set equal to dedicated to enable ballooning
+    dedicated = 4096
   }
-  cpu {
-    cores = 2
-    type  = "host"
+
+  vga {
+    type   = "qxl"
+    memory = 32
   }
 
   network_device {
-    bridge = "vmbr0"
-    model  = "virtio"
+    bridge   = "vmbr0" 
+    firewall = true   
   }
+
   disk {
-    datastore_id = "local-lvm"
-    import_from  = proxmox_virtual_environment_download_file.ubuntu_cloud_image.id
-    interface    = "virtio0"
-    iothread     = true
-    discard      = "on"
-    size         = 20
+    datastore_id = "local"
+    file_id      = proxmox_download_file.parrot_iso.id
+    interface    = "ide0"
+  }
+
+  disk {
+    datastore_id = "local-lvm" 
+    interface    = "scsi0"
+    size         = 50 
+    ssd          = true
   }
 }
+
