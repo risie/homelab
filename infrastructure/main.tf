@@ -26,6 +26,7 @@ resource "proxmox_virtual_environment_vm" "parrot_security_vm" {
   name        = "parrot-security"
   node_name   = var.proxmox_node
 
+  started   = false
   on_boot     = false 
   boot_order = ["scsi0", "net0"]
 
