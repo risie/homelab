@@ -27,6 +27,7 @@ resource "proxmox_virtual_environment_vm" "parrot_security_vm" {
   node_name   = var.proxmox_node
 
   on_boot     = false 
+  boot_order = ["scsi0", "net0"]
 
   cpu {
     cores = 4
