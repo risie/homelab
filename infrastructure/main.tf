@@ -13,7 +13,7 @@ module "k3s_server" {
 
 module "k3s_agent" {
   source             = "./modules/k3s_vm"
-  count              = 3
+  count              = 1
   name               = "agent${count.index}"
   server_ip_address  = module.k3s_server.vm_ip
   ssh_public_key     = data.local_file.ssh_public_key.content
