@@ -8,7 +8,7 @@ module "k3s_server" {
   node_name           = var.proxmox_node
   ssh_public_key      = data.local_file.ssh_public_key.content
   cluster_init        = true
-  vm_template_id     = proxmox_virtual_environment_vm.template.id
+  vm_template_id      = proxmox_virtual_environment_vm.template.id
 }
 
 module "k3s_agent" {
@@ -26,9 +26,9 @@ resource "proxmox_virtual_environment_vm" "parrot_security_vm" {
   name        = "parrot-security"
   node_name   = var.proxmox_node
 
-  started   = false
+  started     = false
   on_boot     = false 
-  boot_order = ["scsi0", "net0"]
+  boot_order  = ["scsi0", "net0"]
 
   cpu {
     cores = 4

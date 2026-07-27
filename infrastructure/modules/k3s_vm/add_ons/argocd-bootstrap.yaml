@@ -1,0 +1,36 @@
+# 1. Create the namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: argocd
+---
+# 2. Deploy ArgoCD Core (Using the official installation manifests)
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: argocd-release
+  namespace: kube-system
+spec:
+  chart: argo-cd
+  repo: https://github.io
+  targetNamespace: argocd
+---
+# 3. The Root App-of-Apps targeting your remote repo
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: root-cluster-configuration
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com'
+    targetRevision: HEAD
+    path: clusters/production # Points to your external repo layout
+  destination:
+    server: 'https://default.svc'
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
