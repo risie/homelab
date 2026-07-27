@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: n8n-workload
+  namespace: default
+  labels:
+    app.kubernetes.io/name: n8n
+    app.kubernetes.io/component: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: n8n-app
+  template:
+    metadata:
+      labels:
+        app: n8n-app
+    spec:
+      containers:
+      - name: web-app
+        image: n8nio/n8n
+        ports:
+        - containerPort: 5678
+          name: http-port
+        env:
+        - name: N8N_SECURE_COOKIE
+          value: "false"

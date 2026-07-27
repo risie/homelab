@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: n8n-internal-svc
+  namespace: default
+spec:
+  type: ClusterIP 
+  selector:
+    app: n8n-app 
+  ports:
+    - name: http
+      port: 80
+      targetPort: 5678
