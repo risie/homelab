@@ -1,0 +1,67 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tailscale-operator
+  namespace: tailscale
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: tailscale-operator
+rules:
+  - apiGroups: [""]
+    resources: ["services", "secrets", "endpoints"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: ["networking.k8s.io"]
+    resources: ["ingresses"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["create", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: tailscale-operator
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: tailscale-operator
+subjects:
+  - kind: ServiceAccount
+    name: tailscale-operator
+    namespace: tailscale
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tailscale-operator
+  namespace: tailscale
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tailscale-operator
+  template:
+    metadata:
+      labels:
+        app: tailscale-operator
+    spec:
+      serviceAccountName: tailscale-operator
+      containers:
+        - name: operator
+          image: tailscale/k8s-operator:latest
+          env:
+            - name: OPERATOR_LOG_LEVEL
+              value: "info"
+            - name: OPERATOR_SECRET_NAME
+              value: tailscale-operator
+            - name: OPERATOR_DEFAULT_TAGS
+              value: "tag:k8s"
+            - name: OPERATOR_HOSTNAME
+              value: "tailscale"
+            - name: TS_AUTHKEY
+              valueFrom:
+                secretKeyRef:
+                  name: tailscale-auth
+                  key: TS_AUTHKEY
