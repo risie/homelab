@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: hermes-webui
-  namespace: default # Ändra till ditt namespace om det behövs
+  namespace: hermes
 spec:
   replicas: 1
   selector:
@@ -14,12 +14,14 @@ spec:
         app: hermes-webui
     spec:
       containers:
-      - name: webui
-        image: ghcr.io/nesquena/hermes-webui:latest 
-        ports:
-        - containerPort: 8643 
-        env:
-        - name: OLLAMA_HOST
-          value: ollama-service
-        - name: DEFAULT_MODEL
-          value: "hermes3"
+        - name: webui
+          image: ghcr.io/nesquena/hermes-webui:latest
+          ports:
+            - containerPort: 8643
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"

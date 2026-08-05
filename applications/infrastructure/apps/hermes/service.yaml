@@ -2,11 +2,11 @@ apiVersion: v1
 kind: Service
 metadata:
   name: hermes-service
-  namespace: default
+  namespace: hermes
 spec:
-  type: ClusterIP 
-  ports:
-  - port: 80
-    targetPort: 8643
+  type: ClusterIP
   selector:
     app: hermes-webui
+  ports:
+    - port: 80
+      targetPort: 8643
