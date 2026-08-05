@@ -9,6 +9,7 @@ main
 *.tfstate
 *.tfstate.*
 .terraform/
+infrastructure/.terraform/
 .terraform.lock.hcl
 
 # Kubeconfig
