@@ -1,19 +1,19 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: n8n-edge-router
+  name: ollama-edge-router
   namespace: default
   annotations:
     kubernetes.io/ingress.class: "traefik"
 spec:
   rules:
-  - host: n8n.cluster.local
+  - host: ollama.cluster.local
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: n8n-service
+            name: ollama-service
             port:
               number: 80
