@@ -10,4 +10,3 @@ resources:
   - forgejo-pvc.yaml
   - forgejo-deployment.yaml
   - forgejo-service.yaml
-  - forgejo-ingress.yaml
