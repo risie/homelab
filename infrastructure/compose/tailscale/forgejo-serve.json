@@ -1,0 +1,16 @@
+{
+  "TCP": {
+    "443": {
+      "HTTPS": {}
+    }
+  },
+  "Web": {
+    "#{TS_CERT_DOMAIN}:443": {
+      "Handlers": {
+        "/": {
+          "Proxy": "http://forgejo:3000"
+        }
+      }
+    }
+  }
+}

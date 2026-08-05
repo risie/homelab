@@ -1,0 +1,92 @@
+services:
+  forgejo-db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    volumes:
+      - forgejo-db-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: forgejo
+      POSTGRES_PASSWORD: CHANGE_ME_FORGEJO_DB_PASS
+      POSTGRES_DB: forgejo
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U forgejo"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  forgejo:
+    image: codeberg.org/forgejo/forgejo:latest
+    restart: unless-stopped
+    depends_on:
+      forgejo-db:
+        condition: service_healthy
+    volumes:
+      - forgejo-data:/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      FORGEJO__server__DOMAIN: CHANGE_ME_FORGEJO_HOSTNAME
+      FORGEJO__server__ROOT_URL: http://CHANGE_ME_FORGEJO_HOSTNAME:3000/
+      FORGEJO__server__HTTP_PORT: 3000
+      FORGEJO__database__DB_TYPE: postgres
+      FORGEJO__database__HOST: forgejo-db:5432
+      FORGEJO__database__NAME: forgejo
+      FORGEJO__database__USER: forgejo
+      FORGEJO__database__PASSWD: CHANGE_ME_FORGEJO_DB_PASS
+
+  forgejo-tailscale:
+    image: tailscale/tailscale:latest
+    restart: unless-stopped
+    depends_on:
+      - forgejo
+    environment:
+      TS_AUTHKEY: CHANGE_ME_TAILSCALE_AUTH_KEY
+      TS_SERVE_CONFIG: /config/serve.json
+      TS_STATE_DIR: /var/lib/tailscale
+    volumes:
+      - tailscale-state-forgejo:/var/lib/tailscale
+      - ./tailscale/forgejo-serve.json:/config/serve.json:ro
+    cap_add:
+      - net_admin
+      - sys_module
+    healthcheck:
+      test: ["CMD", "tailscale", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  hermes:
+    image: ghcr.io/nesquena/hermes-webui:latest
+    restart: unless-stopped
+    volumes:
+      - hermes-data:/app/data
+    environment:
+      FORGEJO_URL: http://forgejo:3000
+
+  hermes-tailscale:
+    image: tailscale/tailscale:latest
+    restart: unless-stopped
+    depends_on:
+      - hermes
+    environment:
+      TS_AUTHKEY: CHANGE_ME_TAILSCALE_AUTH_KEY
+      TS_SERVE_CONFIG: /config/serve.json
+      TS_STATE_DIR: /var/lib/tailscale
+    volumes:
+      - tailscale-state-hermes:/var/lib/tailscale
+      - ./tailscale/hermes-serve.json:/config/serve.json:ro
+    cap_add:
+      - net_admin
+      - sys_module
+    healthcheck:
+      test: ["CMD", "tailscale", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  forgejo-data:
+  forgejo-db-data:
+  hermes-data:
+  tailscale-state-forgejo:
+  tailscale-state-hermes:

@@ -2,63 +2,62 @@ data "local_file" "ssh_public_key" {
   filename = pathexpand("~/.ssh/lab.pub")
 }
 
-module "k3s_server" {
-  source              = "./modules/k3s_vm"
-  name                = "server"
-  node_name           = var.proxmox_node
-  ssh_public_key      = data.local_file.ssh_public_key.content
-  cluster_init        = true
-  vm_template_id      = proxmox_virtual_environment_vm.template.id
+resource "proxmox_download_file" "ubuntu_cloud_image" {
+  content_type = "import"
+  datastore_id = "local"
+  node_name    = var.proxmox_node
+  url          = "https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img"
+  file_name    = "jammy-server-cloudimg-amd64.qcow2"
 }
 
-module "k3s_agent" {
-  source             = "./modules/k3s_vm"
-  count              = 1
-  name               = "agent${count.index}"
-  server_ip_address  = module.k3s_server.vm_ip
-  ssh_public_key     = data.local_file.ssh_public_key.content
-  node_name          = var.proxmox_node
-  vm_template_id     = proxmox_virtual_environment_vm.template.id
- }
-
-
-resource "proxmox_virtual_environment_vm" "parrot_security_vm" {
-  name        = "parrot-security"
-  node_name   = var.proxmox_node
-
-  started     = false
-  on_boot     = false 
-  boot_order  = ["scsi0", "net0"]
+resource "proxmox_virtual_environment_vm" "container_host" {
+  name      = "container-host"
+  node_name = var.proxmox_node
 
   cpu {
-    cores = 4
+    cores = 6
+    type  = "host"
   }
 
   memory {
-    dedicated = 4096
-  }
-
-  vga {
-    type   = "qxl"
-    memory = 32
+    dedicated = 6144
   }
 
   network_device {
-    bridge   = "vmbr0" 
-    firewall = true   
+    bridge   = "vmbr0"
+    firewall = false
   }
 
   disk {
-    datastore_id = "local"
-    file_id      = proxmox_download_file.parrot_iso.id
-    interface    = "ide0"
-  }
-
-  disk {
-    datastore_id = "local-lvm" 
+    datastore_id = "local-lvm"
+    import_from  = proxmox_download_file.ubuntu_cloud_image.id
     interface    = "scsi0"
-    size         = 50 
-    ssd          = true
+    iothread     = true
+    discard      = "on"
+    size         = 80
+  }
+
+  agent {
+    enabled = true
+  }
+
+  initialization {
+    ip_config {
+      ipv4 {
+        address = "dhcp"
+      }
+    }
+    dns {
+      servers = ["1.1.1.1"]
+    }
+
+    user_data_file_id     = proxmox_virtual_environment_file.cloud_config.id
+    network_data_file_id  = proxmox_virtual_environment_file.network_config.id
+  }
+
+  lifecycle {
+    ignore_changes = [
+      disk[0].import_from,
+    ]
   }
 }
-

@@ -1,8 +1,4 @@
-output "server_ip" {
-  value = module.k3s_server.vm_ip
-  description = "Main server ip"
-}
-
-output "agent_ips" {
-  value = [for agent in module.k3s_agent : agent.vm_ip]
+output "container_host_ip" {
+  value       = proxmox_virtual_environment_vm.container_host.ipv4_addresses[0][0]
+  description = "Container host IP address"
 }

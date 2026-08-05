@@ -20,5 +20,3 @@ variable "proxmox_node" {
   type        = string
   default     = "proxmox"
 }
-
-
