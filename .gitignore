@@ -1,2 +1,19 @@
 # Binaries for programs
 main
+
+# Kubernetes secrets (override with real values locally)
+**/secret.yaml
+**/*-secret.yaml
+
+# Terraform/OpenTofu
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+
+# Kubeconfig
+kubeconfig.yaml
+*.kubeconfig
+
+# SOPS (future)
+*.sops.yaml
