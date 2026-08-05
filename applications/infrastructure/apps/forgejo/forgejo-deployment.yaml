@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: forgejo
+  namespace: forgejo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: forgejo
+  template:
+    metadata:
+      labels:
+        app: forgejo
+    spec:
+      containers:
+        - name: forgejo
+          image: codeberg.org/forgejo/forgejo:latest
+          ports:
+            - containerPort: 3000
+              name: http
+            - containerPort: 22
+              name: ssh
+          env:
+            - name: FORGEJO__server__DOMAIN
+              valueFrom:
+                configMapKeyRef:
+                  name: forgejo-config
+                  key: FORGEJO_HOST
+            - name: FORGEJO__server__ROOT_URL
+              value: "http://$(FORGEJO__server__DOMAIN):$(FORGEJO__server__HTTP_PORT)/"
+            - name: FORGEJO__server__HTTP_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: forgejo-config
+                  key: FORGEJO_PORT
+            - name: FORGEJO__database__DB_TYPE
+              value: "postgres"
+            - name: FORGEJO__database__HOST
+              value: "$(POSTGRES_HOST):$(POSTGRES_PORT)"
+            - name: FORGEJO__database__NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: forgejo-config
+                  key: POSTGRES_DB
+            - name: FORGEJO__database__USER
+              valueFrom:
+                secretKeyRef:
+                  name: forgejo-secret
+                  key: POSTGRES_USER
+            - name: FORGEJO__database__PASSWD
+              valueFrom:
+                secretKeyRef:
+                  name: forgejo-secret
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: forgejo-config
+                  key: POSTGRES_HOST
+            - name: POSTGRES_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: forgejo-config
+                  key: POSTGRES_PORT
+            - name: ADMIN_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: forgejo-secret
+                  key: ADMIN_USERNAME
+            - name: ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: forgejo-secret
+                  key: ADMIN_PASSWORD
+            - name: ADMIN_EMAIL
+              value: "admin@cluster.local"
+          volumeMounts:
+            - name: forgejo-storage
+              mountPath: /data
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "500m"
+            limits:
+              memory: "1Gi"
+              cpu: "1"
+      volumes:
+        - name: forgejo-storage
+          persistentVolumeClaim:
+            claimName: forgejo-pvc
