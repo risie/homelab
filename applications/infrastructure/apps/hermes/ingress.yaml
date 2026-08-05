@@ -8,8 +8,7 @@ metadata:
 spec:
   ingressClassName: tailscale
   rules:
-    - host: hermes.cluster.local
-      http:
+    - http:
         paths:
           - path: /
             pathType: Prefix

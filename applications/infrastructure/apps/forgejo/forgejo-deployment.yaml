@@ -19,30 +19,19 @@ spec:
           ports:
             - containerPort: 3000
               name: http
-            - containerPort: 22
-              name: ssh
           env:
             - name: FORGEJO__server__DOMAIN
-              valueFrom:
-                configMapKeyRef:
-                  name: forgejo-config
-                  key: FORGEJO_HOST
+              value: "forgejo.cluster.local"
             - name: FORGEJO__server__ROOT_URL
-              value: "http://$(FORGEJO__server__DOMAIN):$(FORGEJO__server__HTTP_PORT)/"
+              value: "http://$(FORGEJO__server__DOMAIN):3000/"
             - name: FORGEJO__server__HTTP_PORT
-              valueFrom:
-                configMapKeyRef:
-                  name: forgejo-config
-                  key: FORGEJO_PORT
+              value: "3000"
             - name: FORGEJO__database__DB_TYPE
               value: "postgres"
             - name: FORGEJO__database__HOST
-              value: "$(POSTGRES_HOST):$(POSTGRES_PORT)"
+              value: "postgres-service:5432"
             - name: FORGEJO__database__NAME
-              valueFrom:
-                configMapKeyRef:
-                  name: forgejo-config
-                  key: POSTGRES_DB
+              value: "forgejo"
             - name: FORGEJO__database__USER
               valueFrom:
                 secretKeyRef:
@@ -53,28 +42,6 @@ spec:
                 secretKeyRef:
                   name: forgejo-secret
                   key: POSTGRES_PASSWORD
-            - name: POSTGRES_HOST
-              valueFrom:
-                configMapKeyRef:
-                  name: forgejo-config
-                  key: POSTGRES_HOST
-            - name: POSTGRES_PORT
-              valueFrom:
-                configMapKeyRef:
-                  name: forgejo-config
-                  key: POSTGRES_PORT
-            - name: ADMIN_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: forgejo-secret
-                  key: ADMIN_USERNAME
-            - name: ADMIN_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: forgejo-secret
-                  key: ADMIN_PASSWORD
-            - name: ADMIN_EMAIL
-              value: "admin@cluster.local"
           volumeMounts:
             - name: forgejo-storage
               mountPath: /data

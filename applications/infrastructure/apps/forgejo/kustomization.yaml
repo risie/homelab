@@ -3,7 +3,6 @@ kind: Kustomization
 namespace: forgejo
 resources:
   - namespace.yaml
-  - configmap.yaml
   - secret.yaml
   - postgres-pvc.yaml
   - postgres-deployment.yaml
